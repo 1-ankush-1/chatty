@@ -19,7 +19,12 @@ const app = express();
 // app.use(helmet());
 // app.use(compression());
 // app.use(morgan('combined', { stream: accessLogStream }));
-app.use(cors());
+app.use(cors({
+    origin:'http://127.0.0.1:5500',
+    methods:['GET','POST'],
+    credentials:true
+}));
+
 app.use(bodyparser.json({ extended: false }));
 
 /**
