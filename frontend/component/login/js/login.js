@@ -13,35 +13,33 @@ window.onload = function() {
     }, spans.length * 500);
 };
 
-const signupform = document.getElementById("signupform");
-signupform.addEventListener("submit",handelSignup);
+const loginform = document.getElementById("loginform");
+loginform.addEventListener("submit",handelLogin);
 
-function handelSignup(e){
+function handelLogin(e){
     e.preventDefault();
 
-    const signFormData = new FormData(e.target);
+    const loginFormData = new FormData(e.target);
     
     const userData = {}
 
-    for(let [name,value] of signFormData){                             //putting all data in userData
+    for(let [name,value] of loginFormData){                             //putting all data in userData
         userData[name] = value
     }
 
-    if(userData.password !== userData.confirmpassword){               //compare password
-        document.getElementById("passwordmessage").removeAttribute("hidden");
-        return 
-    }
-    document.getElementById("passwordmessage").setAttribute("hidden","");
-
     console.log("data",userData);
-    axios.post("http://localhost:3000/auth/register-user",userData).then((res)=>{
-        console.log(res);
+    axios.post("http://localhost:3000/auth/login-user",userData).then((res)=>{
+        // console.log(res);
         if(res.status === 200){
+            // localStorage.setItem("chatToken")
+            document.getElementById("passwordmessage").setAttribute("hidden","");
             alert("User SuccessFully Registered");
-            window.location.href = "../../login/html/login.html"
+            window.location.href = "../../home/html/home.html"
         }
     }).catch(err =>{
         // console.log(err);
-        alert(err.response.data.message)
+        const errorText = document.getElementById("passwordmessage");
+        errorText.removeAttribute("hidden")
+        errorText.textContent = err.response.data.message;
     })
 }
