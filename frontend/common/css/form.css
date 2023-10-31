@@ -1,0 +1,38 @@
+.mainBody{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.formStructure {
+    border: 1px solid black;
+    border-radius: 10px;
+    width: 70%;
+    height: 80%;
+    padding: 40px;
+}
+.formStructure-head{
+  text-align: center;
+  font-weight: bolder;
+}
+.form-btn:hover{
+    background-color: rgba(9, 9, 47, 0.673);
+    color: white;
+}
+
+@media screen and (min-width: 992px) {
+    /* Styles for large screens */
+    .formStructure {
+        width: 60%;
+        height: 70%;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width: 991px) {
+    /* Styles for medium screens */
+    .formStructure {
+        width: 80%;
+        height: 70%;
+    }
+}
