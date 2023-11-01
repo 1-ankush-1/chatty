@@ -7,31 +7,39 @@ async function onloadData() {
             window.location.href = "../../login/html/login.html";
         }
 
-        axios.get("http://localhost:3000/message/receive", {
-            headers: {
-                Authorization: usertoken
-            }
-        }).then(res => {
-            if (res.status === 200) {
-                const messages = res.data.data
-                console.log(messages)
-                const ul = document.createElement("ul");
-                ul.className = "p-0"
-                const parent = document.getElementById("chatMessage");
-                for (let msg of messages) {
-                    addMessagesInHtml(msg, ul);
-                }
-                parent.appendChild(ul);
-            }
-        }).catch(err => {
-            throw new Error(err);
-        })
+        setInterval(fetchMessages, 1000);
+
     } catch (err) {
         console.log(err);
         if (err.response && (err.response.status === 404 || err.response.status === 500)) {
             alert(err.response.data.message)
         }
     }
+}
+
+function fetchMessages() {
+    axios.get("http://localhost:3000/message/receive", {
+        headers: {
+            Authorization: usertoken
+        }
+    }).then(res => {
+        if (res.status === 200) {
+            const parent = document.getElementById("chatMessage");
+            while(parent.children[0]){
+                parent.removeChild(parent.children[0])
+            }
+            const messages = res.data.data
+            console.log(messages)
+            const ul = document.createElement("ul");
+            ul.className = "p-0"
+            for (let msg of messages) {
+                addMessagesInHtml(msg, ul);
+            }
+            parent.appendChild(ul);
+        }
+    }).catch(err => {
+        console.log(err);
+    })
 }
 
 //onload - fetch from server
