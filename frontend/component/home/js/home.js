@@ -6,8 +6,26 @@ async function onloadData() {
         if (!usertoken) {
             window.location.href = "../../login/html/login.html";
         }
-        console.log(userData);
 
+        axios.get("http://localhost:3000/message/receive", {
+            headers: {
+                Authorization: usertoken
+            }
+        }).then(res => {
+            if (res.status === 200) {
+                const messages = res.data.data
+                console.log(messages)
+                const ul = document.createElement("ul");
+                ul.className = "p-0"
+                const parent = document.getElementById("chatMessage");
+                for (let msg of messages) {
+                    addMessagesInHtml(msg, ul);
+                }
+                parent.appendChild(ul);
+            }
+        }).catch(err => {
+            throw new Error(err);
+        })
     } catch (err) {
         console.log(err);
         if (err.response && (err.response.status === 404 || err.response.status === 500)) {
@@ -18,6 +36,16 @@ async function onloadData() {
 
 //onload - fetch from server
 window.addEventListener("DOMContentLoaded", onloadData);
+
+/**
+ * 
+ */
+function addMessagesInHtml(message, ul) {
+    const li = document.createElement("li");
+    li.className = "mt-2 w-50 bg-light"
+    li.textContent = message.text;
+    ul.appendChild(li);
+}
 
 /**
  * send Message
@@ -34,7 +62,7 @@ function handlesendMsgForm(e) {
             Authorization: usertoken
         }
     }).then(res => {
-        if(res.status === 200){
+        if (res.status === 200) {
             alert("successfully send message")
         }
     }).catch(err => {
