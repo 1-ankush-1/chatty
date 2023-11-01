@@ -54,16 +54,19 @@
         <!-- Message input box and button -->
         <div class="mt-auto">
           <div class="form-group" id="sendMsg">
-            <div class="input-group gap-2">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Enter your message"
-              />
-              <div class="input-group-append" id="chatButton">
-                <button class="btn btn-primary" type="submit">Send</button>
+            <form id="sendMsgForm">
+              <div class="input-group gap-2">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="message"
+                  placeholder="Enter your message"
+                />
+                <div class="input-group-append" id="chatButton">
+                  <button class="btn btn-primary" type="submit">Send</button>
+                </div>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>
