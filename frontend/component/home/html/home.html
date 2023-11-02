@@ -16,37 +16,50 @@
       media="screen"
       href="../../common/css/index.css"
     />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="../css/home.css"
+    />
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-collapse">
       <div class="container-fluid px-3">
         <!-- Logo -->
         <a class="navbar-brand" href="#">
-          <img src="" alt="logo" width="50" height="50" class="opacity-50" />
+          <img
+            src="../../common/img/logo.png"
+            alt="chatty"
+            width="50"
+            height="50"
+            class="opacity-100"
+          />
         </a>
         <ul class="d-flex align-items-center gap-4">
-          <li class="nav-item" id="logout">logout</li>
+          <li class="nav-item navListItem" id="logout">Logout</li>
         </ul>
       </div>
     </nav>
-    <main class="d-flex flex-row gap-2 w-100 justify-content-between px-5">
-      <div class="col-12 col-md-3 m-2" id="chatUserNames">
-        <ul class="m-0">
-          <li class="d-flex gap-3 p-2">
-            <img alt="img" />
-            <h3>name</h3>
+    <main
+      class="d-flex flex-row gap-2 w-100 justify-content-between px-3 overflow-hidden px-5"
+    >
+      <div class="col-12 col-md-2 overflow-auto" id="chatUserNames">
+        <ul class="p-0 m-1 d-flex justify-content-center flex-column gap-1">
+          <li class="d-flex gap-3 p-2 chatusernamelistitem">
+            <img
+              alt="img"
+              src="https://picsum.photos/200/300"
+              class="chatuserimg"
+            />
+            <h3 class="chatusername">raj</h3>
           </li>
         </ul>
       </div>
 
-      <div class="col-12 col-md-9 d-none d-md-block" id="chatScreen">
-        <!-- Avatar and name -->
-        <div class="d-flex flex-row justify-content-end" id="chatHeader">
-          <h2>Avatar</h2>
-        </div>
-
+      <div class="col-12 col-md-10 d-none d-md-block" id="chatScreen">
         <!-- Messages -->
-        <div class="flex-grow-1 overflow-auto" id="chatMessage">
+        <div class="flex-grow-1" id="chatMessage">
           <!-- Your messages go here -->
         </div>
 
@@ -61,8 +74,18 @@
                   id="message"
                   placeholder="Enter your message"
                 />
+                <div id="sendFile" title="sendFile">
+                  <input type="file" id="fileInput" style="display: none" />
+                  <img
+                    src="../../common/img/folder.png"
+                    alt="chatty"
+                    width="40"
+                    height="40"
+                    id="imageToSend"
+                  />
+                </div>
                 <div class="input-group-append" id="chatButton">
-                  <button class="btn btn-primary" type="submit">Send</button>
+                  <button class="btn sendbutton" type="submit">Send</button>
                 </div>
               </div>
             </form>

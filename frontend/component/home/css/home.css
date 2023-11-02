@@ -1,0 +1,52 @@
+#chatMessage {
+  height: 82vh !important;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  margin-bottom: 1vh;
+}
+
+#chatUserNames {
+  background-color: rgba(217, 217, 219, 0.673);
+}
+#sendFile {
+  cursor: pointer;
+}
+
+.navbar {
+  border-bottom: 1px solid rgba(217, 217, 219, 0.673);
+  z-index: 1px;
+}
+.navListItem {
+  cursor: pointer;
+  font-weight: 600 !important;
+  font-size: 1.1em;
+  padding: 10px;
+}
+.navListItem:hover {
+  border-radius: 20px;
+  background-color: rgba(217, 217, 219, 0.673);
+}
+
+.receiver,
+.sendbutton {
+  background-color: #1987808f;
+}
+.chatuserimg {
+  height: 26px;
+  width: 26px;
+  border-radius: 13px;
+}
+.chatusername {
+  font-weight: 600;
+}
+.chatusernamelistitem {
+  background-color: #f8f9fa;
+  width: 100%;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+}
+
+#chatMessage::-webkit-scrollbar {
+  display: none;
+}
