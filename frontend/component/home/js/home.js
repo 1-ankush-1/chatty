@@ -315,7 +315,7 @@ function addGroupsInHtml(group) {
     const div = document.createElement("div");
     const sharebtn = document.createElement("button");
     sharebtn.className = "btn h-100"
-    sharebtn.innerHTML = '<i class="fas fa-share-alt"></i> Share';;
+    sharebtn.innerHTML = '<i class="fas fa-share-alt"></i>';;
     div.className = "d-flex justify-content-center flex-column align-center"
     const h3 = document.createElement("h3");
     h3.className = "chatusername"
@@ -333,6 +333,7 @@ function addGroupsInHtml(group) {
     ul.appendChild(li)
 }
 
+//generate link to share
 function handleShareGroup(e) {
     e.preventDefault();
     let link = `http://localhost:3000/group/user-want-to-add/?groupId=${e.currentTarget.parentElement.id}`;
