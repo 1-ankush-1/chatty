@@ -57,6 +57,24 @@
       class="d-flex flex-row gap-2 w-100 justify-content-between px-3 overflow-hidden px-5"
     >
       <div class="col-12 col-md-2 overflow-auto" id="chatUserNames">
+        <div class="input-group mb-1">
+          <input type="text" class="form-control" placeholder="search user" />
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary sendbutton" type="button">
+              <i class="fa fa-search" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+        <!-- <div style="position: relative; z-index: 1 ;margin: 0;">
+          <ul style="position: absolute; background: white; width: 100%">
+            <li>a</li>
+            <li>b</li>
+            <li>a</li>
+            <li>b</li>
+            <li>a</li>
+            <li>b</li>
+          </ul>
+        </div> -->
         <ul
           class="p-0 m-1 d-flex justify-content-center flex-column gap-1"
           id="chatUserNamesList"
@@ -73,11 +91,31 @@
       </div>
 
       <div class="col-12 col-md-10 d-none d-md-block" id="chatScreen">
+        <div class="d-none" title="leave Group" id="chatScreenHeader">
+          <div
+            id="allGroupMembers"
+            title="see all members"
+            style="position: relative; z-index: 1; margin: 0"
+          >
+            <img src="../../common/img/people.png" height="25" width="25" />
+            <ul class="position-absolute bg-white border-1 border-dark">
+              <li>abc</li>
+              <li>b</li>
+              <li>a</li>
+              <li>b</li>
+              <li>a</li>
+              <li>b</li>
+            </ul>
+          </div>
+          <div id="leaveGroup" title="leave the group">
+            <img src="../../common/img/exit.png" height="25" width="25" />
+          </div>
+        </div>
         <!-- Messages -->
         <div class="flex-grow-1 px-2" id="chatMessage">
           <button
             type="button"
-            class="btn border border-dark offset-5"
+            class="btn border border-dark offset-5 sendbutton"
             id="loadOldMessages"
             title="fetch old messages"
             hidden
@@ -90,7 +128,7 @@
 
         <!-- Message input box and button -->
         <div class="mt-auto">
-          <div class="form-group" id="sendMsg">
+          <div class="form-group" id="sendMsg" hidden>
             <form id="sendMsgForm">
               <div class="input-group gap-2">
                 <input
@@ -102,10 +140,10 @@
                 <div id="sendFile" title="sendFile">
                   <input type="file" id="fileInput" style="display: none" />
                   <img
-                    src="../../common/img/folder.png"
+                    src="../../common/img/multimedia.png"
                     alt="chatty"
-                    width="40"
-                    height="40"
+                    width="35"
+                    height="35"
                     id="imageToSend"
                   />
                 </div>
@@ -131,7 +169,7 @@
               class="close border-0 bg-white"
               id="closeModel"
             >
-              <span aria-hidden="true">❌</span>
+              <img src="../../common/img/close.png" height="15" width="15" />
             </button>
           </div>
           <!-- Form -->

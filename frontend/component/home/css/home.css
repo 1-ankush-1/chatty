@@ -1,5 +1,8 @@
+home {
+  color: #1f1717;
+}
 #chatMessage {
-  height: 82vh !important;
+  height: 77vh !important;
   overflow-y: scroll;
   scroll-behavior: smooth;
   margin-bottom: 1vh;
@@ -12,10 +15,15 @@
 #sendFile {
   cursor: pointer;
 }
+input:hover {
+  border-color: #1f1717;
+}
 
 .navbar {
   border-bottom: 1px solid rgba(217, 217, 219, 0.673);
   z-index: 1px;
+  background-color: #f9f9f9;
+  color: #1f1717;
 }
 .navListItem {
   cursor: pointer;
@@ -26,11 +34,16 @@
 .navListItem:hover {
   border-radius: 20px;
   background-color: rgba(217, 217, 219, 0.673);
+  color: #1f1717;
 }
 
-.receiver,
+.receiver {
+  background-color: #cacaca;
+  color: #1f1717;
+}
 .sendbutton {
-  background-color: #1987808f;
+  background-color: #1f1717;
+  color: #fff !important;
 }
 .chatuserimg {
   height: 26px;
@@ -50,4 +63,11 @@
 
 #chatMessage::-webkit-scrollbar {
   display: none;
+}
+
+#chatUserNamesList li:hover {
+  background-color: #cacaca;
+}
+img {
+  cursor: pointer;
 }

@@ -349,6 +349,8 @@ function handleShareGroup(e) {
 function showGroupMessages(e) {
     e.preventDefault();
 
+    document.getElementById("chatScreenHeader").className = "d-flex justify-content-between p-2"
+    document.getElementById("sendMsg").removeAttribute("hidden");
     //click on not current group
     if (currentGrpId !== e.currentTarget.parentElement.id) {
         currentGrpId = e.currentTarget.parentElement.id;
