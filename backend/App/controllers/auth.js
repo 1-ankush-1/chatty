@@ -1,6 +1,6 @@
 const { User } = require("../models")
 const bcrypt = require("bcrypt");
-const {generateJwtToken} = require("../utils/generateJwtToken");
+const { generateJwtToken } = require("../utils/generateJwtToken");
 
 exports.registerUser = (req, res, next) => {
     const { name, email, phone, password } = req.body;
@@ -86,7 +86,18 @@ exports.loginUser = (req, res, next) => {
             if (result) {
                 //except password send everything
                 let { password: userPassword, ...userDataToSend } = user.dataValues;
+
                 let token = generateJwtToken(userDataToSend.id, userDataToSend.name);
+                // Set the token as a secure cookie
+                res.cookie('authToken', token,
+                    {
+                        expires: new Date(Date.now() + 900000),
+                        httpOnly: true,
+                        secure: process.env.NODE_ENV !== "development",
+                        path: "/",
+                        sameSite: "strict",
+                    });
+
                 return res.status(200).json({
                     message: "User login sucessful", token: token, data: userDataToSend
                 })

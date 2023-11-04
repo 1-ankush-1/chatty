@@ -80,8 +80,12 @@ exports.addUserInGroup = async (req, res, next) => {
     try {
         const { groupId } = req.query;
         const userId = req.userId;
-        console.log(groupId, userId);
-        res.status(200).send("added");
+        if (groupId === null || userId === null) {
+            return res.status(404).json({ message: "no group exist" });
+        }
+        const group = { groupId, userId }
+        await UserGroup.create(group);
+        res.status(200).json({ message: "added successfully" });
     } catch (err) {
         await t.rollback();
         console.log(`${err} in addUserInGroup`)
@@ -119,19 +123,19 @@ exports.wantToAddInGroup = async (req, res, next) => {
                     let token = localStorage.getItem('chatToken');  // Fetch token from local storage
                     console.log("token",token);
         
-                    axios.get('http://localhost:3000/group/adduser?groupId=${groupId}', {
+                    axios.get('${process.env.ALLOWED_DOMAIN}:3000/group/adduser?groupId=${groupId}', {
                         headers: {
                             Authorization: token
                         }
                     }).then(res => {
                         if(res.status === 200){
-                            window.location.href = 'http://127.0.0.1:5500/frontend/component/home/html/home.html';  // Redirect to home.html
+                            window.location.href = '${process.env.ALLOWED_DOMAIN}:5500/frontend/component/home/html/home.html';  // Redirect to home.html
                         }
                     })
                     .catch(error => {
                         if (error.response && error.response.status === 401) {
                             alert('Login then try...'); 
-                            window.location.href = 'http://127.0.0.1:5500/frontend/component/home/html/home.html'
+                            window.location.href = '${process.env.ALLOWED_DOMAIN}:5500/frontend/component/home/html/home.html'
                         } else {
                             alert('Failed. Please try again.'); 
                         }
@@ -139,7 +143,7 @@ exports.wantToAddInGroup = async (req, res, next) => {
                 });
         
                 document.getElementById('noBtn').addEventListener('click', function() {
-                    window.location.href = 'http://127.0.0.1:5500/frontend/component/home/html/home.html'
+                    window.location.href = '${process.env.ALLOWED_DOMAIN}:5500/frontend/component/home/html/home.html'
                 });
             </script>
         </body>

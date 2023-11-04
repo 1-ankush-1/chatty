@@ -2,12 +2,13 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../models")
 
 const Authentication = (req, res, next) => {
-    try {
-        let token = req.header("Authorization")
+    try {   
+        console.log("here is your token",req.cookietoken);
+        //check if cookie has the token else get from jwt header
+        let token = req.cookietoken ? req.cookietoken : req.header("Authorization")
         // token = token.split(' ')[1]
-        console.log(token)
+        // console.log(token)
 
-        // console.log(token);
         const tokendetails = jwt.verify(token, process.env.SECRET);
         // console.log(tokendetails)
         User.findByPk(

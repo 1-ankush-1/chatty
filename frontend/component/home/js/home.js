@@ -292,8 +292,9 @@ function handleGroupModalForm(e) {
 function fetchGroups() {
     axios.get("http://localhost:3000/group/fetchall", {
         headers: {
-            Authorization: usertoken
-        }
+            Authorization: usertoken,
+        },
+        withCredentials: true
     }).then(res => {
         if (res.status === 200) {
             const userGroups = res.data.data;
