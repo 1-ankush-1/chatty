@@ -13,7 +13,7 @@ const app = express();
 
 app.use(cors({
     origin: [`${process.env.ALLOWED_DOMAIN}:5500`],
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'DELETE'],
     credentials: true
 }));
 app.use(cookieParser());

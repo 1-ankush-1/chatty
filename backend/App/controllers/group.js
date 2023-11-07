@@ -16,13 +16,13 @@ exports.createGroup = async (req, res, next) => {
 
         //group obj
         const group = {
-            name, desc, adminid: userId
+            name, desc
         }
         //create group
         const createdGroup = await Group.create(group, { transaction: t });
-        console.log(createdGroup.id)
+
         //add a user
-        await UserGroup.create({ userId, groupId: createdGroup.id }, { transaction: t })
+        await UserGroup.create({ userId, groupId: createdGroup.id, isAdmin: true }, { transaction: t })
 
         await t.commit();
         res.status(200).json({
@@ -58,6 +58,7 @@ exports.fetchGroups = async (req, res, next) => {
         // Fetch all groups that match the group IDs
         const groups = await Group.findAll({
             where: { id: groupIds },
+            attributes: ["id", "name", "desc"],
             transaction: t
         });
 
@@ -72,6 +73,104 @@ exports.fetchGroups = async (req, res, next) => {
         await t.rollback();
         console.log(`${err} in fetchGroups`)
         return res.status(500).json({ message: "failed to fetch group" });
+    }
+}
+
+exports.fetchAllGroupMembers = async (req, res, next) => {
+    const t = await sequelize.transaction();
+    try {
+        const userId = req.userId;
+        const { groupId } = req.query;
+
+        if (userId === null) {
+            return res.status(404).json({ message: "no user found" });
+        }
+
+        // fetch all users and group 
+        const group = await Group.findOne({
+            where: { id: groupId },
+            include: [
+                {
+                    model: User,
+                    through: {
+                        attributes: ['isAdmin']
+                    },
+                    attributes: ['id', 'name']
+                }
+            ],
+            transaction: t
+        });
+
+        //setting admin
+        const users = group.users.map(user => {
+            return { ...user.dataValues, admin: user.usergroup.isAdmin };
+        });
+
+        t.commit();
+        res.status(200).json({
+            message: "successfully fetched",
+            data: users
+        })
+    } catch (err) {
+        await t.rollback();
+        console.log(`${err} in fetchAllGroupMembers`)
+        return res.status(500).json({ message: "failed to fetch group" });
+    }
+}
+
+exports.userWantToLeaveGroup = async (req, res, next) => {
+    const t = await sequelize.transaction();
+    try {
+        const userId = req.userId;
+        const { groupId } = req.body;
+        //check if user exist
+        let user = await UserGroup.findOne({
+            where: {
+                userId,
+                groupId
+            }
+        }, { transaction: t });
+        if (!user) {
+            return res.status(404).json({ message: "user is not part of group" });
+        }
+        console.log(user);
+        //delete that user
+        await user.destroy({ transaction: t })
+
+        t.commit()
+        res.status(200).json({
+            message: "successfully left"
+        })
+    } catch (err) {
+        await t.rollback();
+        console.log(`${err} in userWantToLeaveGroup`)
+        return res.status(500).json({ message: "failed to leave group" });
+    }
+}
+
+exports.removeMemberFromGroup = async (req, res, next) => {
+    const t = await sequelize.transaction();
+    try {
+        const { id } = req.params;
+        const { groupId } = req.query;
+        const groupExist = await UserGroup.findOne({
+            where: {
+                userId: id,
+                groupId: groupId
+            }
+        })
+        if (!groupExist) {
+            throw new Error("group not exist")
+        }
+        await groupExist.destroy();
+        t.commit();
+        res.send(200).json({
+            message: "group deleted successfully"
+        })
+    } catch (err) {
+        await t.rollback();
+        console.log(`${err} in removeMemberFromGroup`)
+        return res.status(500).json({ message: "failed to remove memeber from group" });
     }
 }
 

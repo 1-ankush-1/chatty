@@ -2,8 +2,8 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../models")
 
 const Authentication = (req, res, next) => {
-    try {   
-        console.log("here is your token",req.cookietoken);
+    try {
+        console.log("here is your token", req.cookietoken);
         //check if cookie has the token else get from jwt header
         let token = req.cookietoken ? req.cookietoken : req.header("Authorization")
         // token = token.split(' ')[1]
