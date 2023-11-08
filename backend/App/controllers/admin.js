@@ -1,7 +1,7 @@
 const sequelize = require("../config/connect");
-const { Group, User } = require("../models");
+const { Group } = require("../models");
 const UserGroup = require("../models/usergroup");
-const { groupExist } = require("../services/admin");
+const { groupWithUserExist } = require("../services/admin");
 
 exports.creatingAdminOfGroup = async (req, res, next) => {
     const t = await sequelize.transaction();
@@ -10,12 +10,17 @@ exports.creatingAdminOfGroup = async (req, res, next) => {
         if (groupId === null || userId === null) {
             return res.status(404).json({ message: "empty Credentials" });
         }
-
-        const group = await groupExist(groupId, userId);
+        const group = await groupWithUserExist(groupId, userId, t);
 
         if (!group) {
-            return res.status(404).json({ message: "no Group exist" });
+            return res.status(404).json({ message: "no user exist" });
         }
+        group.isAdmin = true;
+        await group.save({ transaction: t });
+        t.commit();
+        res.status(200).json({
+            message: "admin created successfully"
+        })
     } catch (err) {
         await t.rollback();
         console.log(`${err} in removeMemberFromGroup`)
@@ -32,13 +37,13 @@ exports.removeMemberFromGroup = async (req, res, next) => {
         if (groupId === null || id === null) {
             return res.status(404).json({ message: "empty Credentials" });
         }
-        
-        const group = await groupExist(groupId, id);
+
+        const group = await groupWithUserExist(groupId, id, t);
 
         if (!group) {
-            return res.status(404).json({ message: "no Group exist" });
+            return res.status(404).json({ message: "no user exist" });
         }
-        await group.destroy();
+        await group.destroy({ transaction: t });
         t.commit();
         res.status(200).json({
             message: "group deleted successfully"
@@ -58,12 +63,12 @@ exports.addUserInGroup = async (req, res, next) => {
         if (groupId === null || userId === null) {
             return res.status(404).json({ message: "empty Credentials" });
         }
-        const findGroup = await Group.findByPk(groupId);
-        if (!findGroup) {
+        const groupExist = await Group.findByPk(groupId, { transaction: t });
+        if (!groupExist) {
             return res.status(404).json({ message: "no Group exist" });
         }
         const group = { groupId, userId }
-        await UserGroup.create(group);
+        await UserGroup.create(group, { transaction: t });
         res.status(200).json({ message: "added successfully" });
     } catch (err) {
         await t.rollback();

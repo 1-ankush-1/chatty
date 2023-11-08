@@ -1,10 +1,10 @@
 const UserGroup = require("../models/usergroup")
 
-exports.groupExist = async (groupId, userId) => {
+exports.groupWithUserExist = async (groupId, userId, t) => {
     return await UserGroup.findOne({
         where: {
             groupId,
             userId
         }
-    })
+    }, { transaction: t })
 }
