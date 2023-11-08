@@ -4,6 +4,7 @@ const cors = require("cors");
 const Router = require("./App/routes/index.js")
 const sequelize = require("./App/config/connect.js");
 const cookieParser = require("cookie-parser");
+const fileUpload = require("express-fileupload");
 
 const app = express();
 
@@ -18,7 +19,14 @@ app.use(cors({
 }));
 app.use(cookieParser());
 app.use(bodyparser.json({ extended: false }));
-
+app.use(
+    fileUpload({
+        limits: {
+            fileSize: 2000000,
+        },
+        abortOnLimit: true,
+    })
+);
 /**
  * Routes
  */
@@ -27,7 +35,7 @@ app.use(Router);
 /**
  * sync with database
  */
-sequelize.sync({ force: true }).then(() => {
+sequelize.sync().then(() => {
     /**
     * start server
     */

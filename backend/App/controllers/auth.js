@@ -1,57 +1,63 @@
 const { User } = require("../models")
 const bcrypt = require("bcrypt");
 const { generateJwtToken } = require("../utils/generateJwtToken");
+const sequelize = require("../config/connect");
+const { uploadToS3 } = require("../services/s3_service");
 
-exports.registerUser = (req, res, next) => {
-    const { name, email, phone, password } = req.body;
+exports.registerUser = async (req, res, next) => {
+    const t = await sequelize.transaction();
+    try {
+        const { name, email, phone, password, about } = req.body;
+        const { profile } = req.files;
 
-    if (!name || !email || !phone || !password) {
-        return res.status(404).json({
-            message: "some field are empty",
-        })
-    }
-
-    const user = { name, email, phone, password }
-
-    User.findOne({
-        where: {
-            email: email
+        if (!name || !email || !phone || !password) {
+            return res.status(404).json({
+                message: "some field are empty",
+            })
         }
-    }).then((result) => {
-        //no user create one
-        if (!result) {
-            //hash the password(salt - randomness)
-            bcrypt.hash(user.password, parseInt(process.env.SALT), (err, hash) => {
-                if (err) {
-                    console.log(`${err} in signup`)
-                    return res.status(500).json({
-                        message: "failed to register user",
-                    })
-                }
-                user.password = hash;
-                User.create(user).then(result => {
-                    res.status(200).json({
-                        message: "registered successfully",
-                        data: result
-                    })
-                }).catch(err => {
-                    console.log(`${err} in registerUser`);
-                    res.status(500).json({
-                        message: "failed to register user",
-                    })
-                })
-            });
-        } else {
+        //userobj
+        const user = { name, email, phone, password, about }
+
+        //find user already exist
+        const result = await User.findOne({
+            where: {
+                email: email
+            }
+        }, { transaction: t })
+
+        if (result) {
             res.status(404).json({
                 message: "user already exist",
             })
         }
-    }).catch(err => {
+
+        //hash the password(salt - randomness)
+        bcrypt.hash(user.password, parseInt(process.env.SALT), async (err, hash) => {
+            if (err) {
+                console.log(`${err} in signup`)
+                return res.status(500).json({
+                    message: "failed to register user",
+                })
+            }
+            user.password = hash;
+            const url = await uploadToS3(profile.data, `profile/${profile.name}`);
+            // console.log(url);
+            user.profile = url;
+            const newUser = await User.create(user, { transaction: t })
+            await t.commit();
+            res.status(200).json({
+                message: "registered successfully",
+                data: newUser
+            })
+        })
+
+    } catch (err) {
+        await t.rollback();
         console.log(`${err} in registerUser`);
         res.status(500).json({
             message: "failed to register user",
         })
-    })
+    }
 }
 
 exports.loginUser = (req, res, next) => {
