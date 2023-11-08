@@ -11,6 +11,11 @@ const Message = sequelize.define("message", {
     text: {
         type: Sequelize.STRING,
         allowNull: false,
+    },
+    conversationType: {
+        type: Sequelize.ENUM("user", "group"),
+        allowNull: true,
+        defaultValue: "user",
     }
 })
 

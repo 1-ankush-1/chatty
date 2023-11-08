@@ -24,6 +24,17 @@ const User = sequelize.define("user", {
     password: {
         type: Sequelize.STRING,
         allowNull: false
+    },
+    lastSeen: {
+        type: Sequelize.DATE,
+        defaultValue: new Date(),
+    },
+    profile: {
+        type: Sequelize.STRING,
+        defaultValue: "https://chattymessanger.s3.amazonaws.com/default_img/default.jpg"
+    },
+    about: {
+        type: Sequelize.TEXT,
     }
 })
 

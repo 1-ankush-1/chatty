@@ -27,15 +27,14 @@ app.use(Router);
 /**
  * sync with database
  */
-sequelize.sync().then(() => {
+sequelize.sync({ force: true }).then(() => {
+    /**
+    * start server
+    */
+    app.listen(process.env.port || 3000, () => {
+        console.log(`server is running on http://localhost:${process.env.port || 3000}`)
+    })
 }).catch(err => {
     console.log(`${err} occured whne syncing with sequalize`)
 });
 
-
-/**
- * start server
-*/
-app.listen(process.env.port || 3000, () => {
-    console.log(`server is running on http://localhost:${process.env.port || 3000}`)
-})
