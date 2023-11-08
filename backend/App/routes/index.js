@@ -6,6 +6,7 @@ const messageRoutes = require("./message.js");
 const groupRoutes = require("./group.js");
 const userRoutes = require("./user.js")
 
+//all routes
 router.use("/auth", authRoutes);
 router.use("/user", Authentication, userRoutes);
 router.use("/message", Authentication, messageRoutes);
