@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 const { Message } = require("../models");
 const sequelize = require("../config/connect");
-const msgLimit = 20;
+const msgLimit = process.env.MSG_LIMIT;
 let totalMsg;
 
 exports.sendMessage = async (req, res, next) => {

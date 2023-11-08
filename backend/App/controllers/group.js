@@ -85,7 +85,7 @@ exports.fetchAllGroupMembers = async (req, res, next) => {
             return res.status(404).json({ message: "no user found" });
         }
 
-        // fetch all users and group 
+        // fetch all users from this group 
         const group = await Group.findOne({
             where: { id: groupId },
             include: [
@@ -136,7 +136,7 @@ exports.userWantToLeaveGroup = async (req, res, next) => {
         if (!user) {
             return res.status(404).json({ message: "user is not part of group" });
         }
-        console.log(user);
+        // console.log(user);
         //delete that user
         await user.destroy({ transaction: t })
 
