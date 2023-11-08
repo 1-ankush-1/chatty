@@ -1,4 +1,3 @@
-
 const sequelize = require("../config/connect");
 const { Group, User } = require("../models");
 const UserGroup = require("../models/usergroup");
@@ -103,7 +102,11 @@ exports.fetchAllGroupMembers = async (req, res, next) => {
 
         //setting admin
         const users = group.users.map(user => {
-            return { ...user.dataValues, admin: user.usergroup.isAdmin };
+            let member = {};
+            member.id = user.id
+            member.name = user.name
+            member.isAdmin = user.usergroup.isAdmin
+            return member;
         });
 
         t.commit();
@@ -164,7 +167,7 @@ exports.removeMemberFromGroup = async (req, res, next) => {
         }
         await groupExist.destroy();
         t.commit();
-        res.send(200).json({
+        res.status(200).json({
             message: "group deleted successfully"
         })
     } catch (err) {
@@ -180,7 +183,11 @@ exports.addUserInGroup = async (req, res, next) => {
         const { groupId } = req.query;
         const userId = req.userId;
         if (groupId === null || userId === null) {
-            return res.status(404).json({ message: "no group exist" });
+            return res.status(404).json({ message: "empty Credentials" });
+        }
+        const findGroup = await Group.findByPk(groupId);
+        if (!findGroup) {
+            return res.status(404).json({ message: "no Group exist" });
         }
         const group = { groupId, userId }
         await UserGroup.create(group);

@@ -7,7 +7,7 @@ const Authentication = (req, res, next) => {
         //check if cookie has the token else get from jwt header
         let token = req.cookietoken ? req.cookietoken : req.header("Authorization")
         // token = token.split(' ')[1]
-        // console.log(token)
+        console.log(token)
 
         const tokendetails = jwt.verify(token, process.env.SECRET);
         // console.log(tokendetails)

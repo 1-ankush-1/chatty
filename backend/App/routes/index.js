@@ -4,8 +4,10 @@ const Authentication = require("../middlewares/authenticateUser")
 const authRoutes = require("./auth.js");
 const messageRoutes = require("./message.js");
 const groupRoutes = require("./group.js");
+const userRoutes = require("./user.js")
 
 router.use("/auth", authRoutes);
+router.use("/user", Authentication, userRoutes);
 router.use("/message", Authentication, messageRoutes);
 router.use("/group", groupRoutes);
 
