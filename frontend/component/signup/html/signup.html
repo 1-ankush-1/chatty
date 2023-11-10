@@ -22,11 +22,17 @@
       rel="stylesheet"
       type="text/css"
       media="screen"
+      href="../css/signup.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
       href="../../common/css/form.css"
     />
   </head>
   <body>
-    <div class="mainBody">
+    <div class="mainBody d-flex justify-content-center align-items-center">
       <main class="formStructure">
         <div class="formStructure-head">
           <h1 class="formStructure-head-name">
@@ -39,61 +45,93 @@
           </h1>
         </div>
         <form id="signupform">
-          <div class="form-outline mb-2">
-            <label for="name" class="form-label"> Name </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              class="form-control form-control-md"
-              required
+          <div class="d-flex justify-content-center align-items-center my-1">
+            <img
+              id="profileDisplay"
+              src="../../common/img/default.jpg"
+              alt="profile"
+              height="150px"
+              width="150px"
             />
           </div>
-
-          <div class="form-outline mb-2">
-            <label for="email" class="form-check-label"> Email </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              class="form-control form-control-md"
-              required
-            />
+          <hr />
+          <div class="row">
+            <div class="col-md-6 form-outline mb-2">
+              <label for="name" class="form-label"> Name </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                class="form-control form-control-md"
+                required
+              />
+            </div>
+            <div class="col-md-6 form-outline mb-2">
+              <label for="name" class="form-label"> Profile Pic </label>
+              <input
+                type="file"
+                id="profile"
+                name="profile"
+                class="form-control form-control-md"
+              />
+            </div>
           </div>
-          <div class="form-outline mb-2">
-            <label for="phone" class="form-check-label"> Phone </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              class="form-control form-control-md"
-              required
-            />
+          <div class="row">
+            <div class="col-md-6 form-outline mb-2">
+              <label for="email" class="form-check-label"> Email </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-control form-control-md"
+                required
+              />
+            </div>
+            <div class="col-md-6 form-outline mb-2">
+              <label for="phone" class="form-check-label"> Phone </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                class="form-control form-control-md"
+                required
+              />
+            </div>
           </div>
-          <div class="form-outline mb-2">
-            <label for="password" class="form-check-label"> Password </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              class="form-control form-control-md"
-              required
-            />
+          <div class="row">
+            <div class="col-md-6 form-outline mb-2">
+              <label for="password" class="form-check-label"> Password </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control form-control-md"
+                required
+              />
+            </div>
+            <div class="col-md-6 form-outline mb-2">
+              <label for="confirmpassword" class="form-check-label">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="confirmpassword"
+                name="confirmpassword"
+                class="form-control form-control-md"
+                required
+              />
+            </div>
           </div>
           <p class="text-danger mt-3 mb-0" id="passwordmessage" hidden>
             password doesnot match confirm password
           </p>
           <div class="form-outline mb-2">
-            <label for="confirmpassword" class="form-check-label">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirmpassword"
-              name="confirmpassword"
+            <label for="about" class="form-check-label"> About </label>
+            <textarea
+              id="about"
+              name="about"
               class="form-control form-control-md"
-              required
-            />
+            ></textarea>
           </div>
           <div class="d-flex justify-content-center">
             <button
@@ -103,7 +141,6 @@
               Signup
             </button>
           </div>
-
           <p class="text-center text-muted mt-3 mb-0">
             Already have an account?
             <a href="../../login/html/login.html" class="fw-bold text-body"

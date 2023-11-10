@@ -1,15 +1,24 @@
-.formStructure {
-  width: 40%;
-  height: 55%;
-}
 .formStructure-head {
   margin-bottom: 20px;
 }
+#spinImage {
+  border-radius: 15px;
+  height: 30px;
+  width: 30px;
+  animation: spin 3s infinite linear;
+}
 
-@media screen and (max-width: 800px) {
-  /* Styles for medium screens */
-  .formStructure {
-    width: 80%;
-    height: 60%;
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(90deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }

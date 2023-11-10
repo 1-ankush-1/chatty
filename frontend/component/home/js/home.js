@@ -1,3 +1,4 @@
+let msgType = "user";
 const userData = JSON.parse(localStorage.getItem("userData"));
 const usertoken = localStorage.getItem("chatToken");
 let myInterval;
@@ -10,7 +11,6 @@ async function onloadData() {
         }
         //fetch all the messages
         fetchGroups();
-
     } catch (err) {
         console.log(err);
         if (err.response && (err.response.status === 404 || err.response.status === 500)) {
@@ -220,7 +220,7 @@ function fetchMessages() {
 function addMessagesInHtml(message, ul) {
     const li = document.createElement("li");
     li.id = message.id;
-    li.className = (message.userId === userData.id) ? "p-2 my-2 bg-light text-wrap rounded text-start text-lg" : "p-2 my-2 text-wrap rounded text-end receiver text-lg";
+    li.className = (message.senderId === userData.id) ? "p-2 my-2 bg-light text-wrap rounded text-start text-lg" : "p-2 my-2 text-wrap rounded text-end receiver text-lg";
     li.textContent = message.text;
     ul.appendChild(li);
 }
@@ -234,8 +234,13 @@ sendMsgForm.addEventListener("submit", handlesendMsgForm);
 function handlesendMsgForm(e) {
     e.preventDefault();
     const message = document.getElementById("message");
-
-    axios.post("http://localhost:3000/message/send", { text: message.value, groupId: currentGrpId }, {
+    let messageContent;
+    if (msgType === "group") {
+        messageContent = { text: message.value, groupId: currentGrpId }
+    } else {
+        messageContent = { text: message.value, receiverId: currentuserId }
+    }
+    axios.post("http://localhost:3000/message/send", messageContent, {
         headers: {
             Authorization: usertoken
         }
@@ -248,6 +253,128 @@ function handlesendMsgForm(e) {
         console.log(err);
         alert("failed to send msg")
     })
+}
+/**
+ * User
+ */
+let currentuserId;
+function showUserMessages() {
+    //fetch all the messages of that user
+    axios.get(`http://localhost:3000/message/receive/?receiverId=${currentuserId}`, {
+        headers: {
+            Authorization: usertoken
+        }
+    }).then(res => {
+        if (res.status === 200) {
+            console.log(res);
+        }
+    }).catch(err => {
+        console.log(err);
+    })
+}
+
+
+/**
+ * Search User
+*/
+const triggerSearchUser = document.getElementById("triggerSearchUser")
+triggerSearchUser.addEventListener("click", handleSearchedUser);
+const searchedUserList = document.getElementById("searchedUserList");
+
+function handleSearchedUser(e) {
+    e.preventDefault();
+    const name = document.getElementById("searchedusername");
+    axios.get(`http://localhost:3000/user/by_name/${name.value}`, {
+        headers: {
+            Authorization: usertoken
+        }
+    }).then(res => {
+        if (res.status === 200) {
+            console.log(res)
+            for (let user of res.data.data) {
+                placeSearchedUserInHtml(user);
+            }
+        }
+    }).catch(err => {
+        console.log(err);
+        alert("failed to create group");
+    })
+}
+
+function placeSearchedUserInHtml(user) {
+    const li = document.createElement("li");
+    li.className = "d-flex justify-content-between p-2 cursor-pointer"
+    li.id = user.id;
+    li.textContent = user.name;
+    li.addEventListener("click", handleSelectedSearchUser)
+    searchedUserList.appendChild(li);
+    const hr = document.createElement("hr");
+    searchedUserList.appendChild(hr);
+}
+
+function handleSelectedSearchUser(e) {
+    e.preventDefault();
+    console.log("clicked", e.target);
+    let id = e.target.id;
+    let name = e.target.textContent;
+    let desc = "something";
+    const chat = { id, name, desc }
+    addChatInHtml(chat);
+}
+
+/**
+ * Common in User N Group
+ */
+function addChatInHtml(chat, chatType) {
+    let sharebtn;
+    const ul = document.getElementById("chatUserNamesList");
+    const li = document.createElement("li");
+    li.cid = chat.id
+    li.className = "d-flex justify-content-between chatusernamelistitem p-2 cursor-pointer"
+    const div = document.createElement("div");
+    if (chatType === "group") {
+        sharebtn = document.createElement("button");
+        sharebtn.className = "btn h-100"
+        sharebtn.title = "Share group url"
+        sharebtn.innerHTML = '<i class="fas fa-share-alt"></i>';
+    }
+    div.className = "d-flex justify-content-center flex-column align-center"
+    const h3 = document.createElement("h6");
+    h3.className = "chatusername"
+    h3.textContent = chat.name
+    const p = document.createElement("p");
+    p.className = "word-wrap te"
+    p.title = chat.desc;
+    p.textContent = chat.desc.substring(0, 11) + ".."
+    div.appendChild(h3);
+    div.appendChild(p);
+    div.addEventListener("click", showMessages);
+    li.appendChild(div);
+    if (chatType === "group") {
+        sharebtn.addEventListener("click", handleShareGroup);
+        li.appendChild(sharebtn);
+    }
+    ul.prepend(li)
+}
+
+function showMessages(e) {
+    e.preventDefault();
+    console.log(msgType)
+    document.getElementById("chatScreenHeader").className = "d-flex justify-content-between p-2"
+    document.getElementById("sendMsg").removeAttribute("hidden");
+
+    //cleare the messages of prev group
+    clearMessageScreeen();
+
+    const loadOldMessages = document.getElementById("loadOldMessages");
+    loadOldMessages.setAttribute("hidden", "");
+    if (msgType === "group") {
+        currentGrpId = e.currentTarget.parentElement.cid;
+        fetchMessages();
+    } else {
+        currentuserId = e.currentTarget.parentElement.cid;
+        showUserMessages();
+    }
 }
 
 /**
@@ -281,7 +408,7 @@ function handleGroupModalForm(e) {
         if (res.status === 200) {
             alert("successfully created group");
             GroupModel.hide();
-            addGroupsInHtml(res.data.data);
+            addChatInHtml(res.data.data);
         }
     }).catch(err => {
         console.log(err);
@@ -290,7 +417,7 @@ function handleGroupModalForm(e) {
 }
 
 function fetchGroups() {
-    axios.get("http://localhost:3000/group/fetchall", {
+    axios.get("http://localhost:3000/group/fetch_all", {
         headers: {
             Authorization: usertoken,
         },
@@ -300,7 +427,7 @@ function fetchGroups() {
             const userGroups = res.data.data;
             // userGroups = 
             for (let grp of userGroups) {
-                addGroupsInHtml(grp);
+                addChatInHtml(grp, "group");
             }
         }
     }).catch(err => {
@@ -308,36 +435,11 @@ function fetchGroups() {
     })
 }
 
-function addGroupsInHtml(group) {
-    const ul = document.getElementById("chatUserNamesList");
-    const li = document.createElement("li");
-    li.id = group.id
-    li.className = "d-flex justify-content-between chatusernamelistitem p-2 cursor-pointer"
-    const div = document.createElement("div");
-    const sharebtn = document.createElement("button");
-    sharebtn.className = "btn h-100"
-    sharebtn.innerHTML = '<i class="fas fa-share-alt"></i>';;
-    div.className = "d-flex justify-content-center flex-column align-center"
-    const h3 = document.createElement("h3");
-    h3.className = "chatusername"
-    h3.textContent = group.name
-    const p = document.createElement("p");
-    p.className = "word-wrap te"
-    p.title = group.desc;
-    p.textContent = group.desc.substring(0, 11) + ".."
-    div.appendChild(h3);
-    div.appendChild(p);
-    div.addEventListener("click", showGroupMessages);
-    li.appendChild(div);
-    sharebtn.addEventListener("click", handleShareGroup);
-    li.appendChild(sharebtn);
-    ul.appendChild(li)
-}
 
 //generate link to share
 function handleShareGroup(e) {
     e.preventDefault();
-    let link = `http://localhost:3000/group/user-want-to-add/?groupId=${e.currentTarget.parentElement.id}`;
+    let link = `http://localhost:3000/group/add_request/?groupId=${e.currentTarget.parentElement.id}`;
     navigator.clipboard.writeText(link)
         .then(() => {
             alert(`Share your link: '${link}'\n\nIt has also been copied to your clipboard do: Cntrl+v.`);
@@ -346,27 +448,133 @@ function handleShareGroup(e) {
             console.error('Could not copy text: ', err);
         });
 }
-function showGroupMessages(e) {
-    e.preventDefault();
 
-    document.getElementById("chatScreenHeader").className = "d-flex justify-content-between p-2"
-    document.getElementById("sendMsg").removeAttribute("hidden");
-    //click on not current group
-    if (currentGrpId !== e.currentTarget.parentElement.id) {
-        currentGrpId = e.currentTarget.parentElement.id;
-        //cleare the messages of prev group
-        try {
-            while (unorderedChatBox.firstChild) {
-                unorderedChatBox.removeChild(unorderedChatBox.firstChild);
-            }
-        } catch (err) {
-            console.log(err);
+function clearMessageScreeen() {
+    try {
+        while (unorderedChatBox.firstChild) {
+            unorderedChatBox.removeChild(unorderedChatBox.firstChild);
         }
-        const loadOldMessages = document.getElementById("loadOldMessages");
-        loadOldMessages.setAttribute("hidden", "");
-        fetchMessages();
+    } catch (err) {
+        console.log(err);
     }
 }
+
+//leave group
+const leaveGroup = document.getElementById("leaveGroup");
+leaveGroup.addEventListener("click", handleLeaveGroup);
+
+function handleLeaveGroup(e) {
+    e.preventDefault();
+    if (confirm("do you want to leave the group!")) {
+        axios.post("http://localhost:3000/group/leave", { groupId: currentGrpId }, {
+            headers: {
+                Authorization: usertoken,
+            }
+        }).then(res => {
+            if (res.status === 200) {
+                alert("successfully left the group");
+                window.location.reload();
+            }
+        }).catch(err => {
+            console.log(err.response);
+            alert("failed to leave try again!!")
+        })
+    }
+}
+
+//groupMembers
+const allGroupMembers = document.getElementById("allGroupMembers");
+allGroupMembers.addEventListener("click", handleGroupMember);
+
+function handleGroupMember(e) {
+    e.preventDefault();
+    axios.get(`http://localhost:3000/group/members/?groupId=${currentGrpId}`, {
+        headers: {
+            Authorization: usertoken,
+        }
+    }).then(res => {
+        if (res.status === 200) {
+            const allMembers = res.data.data;
+            const ul = document.getElementById("allGroupMembersList");
+            //set of adminid for searching
+            const admin = new Set(allMembers.filter(member => member.isAdmin).map(member => member.id));
+
+            for (let member of allMembers) {
+                showGroupMembersInHtml(member, ul, admin)
+            }
+            ul.addEventListener('click', (e) => {
+                // Stop the propagation of the click event
+                e.stopPropagation();
+                // Check if the clicked element is a button
+                console.log("hit", e.target.className)
+                if (e.target.parentNode.className.includes('remove member') && e.target.className.includes('removeFromGroup')) {
+                    if (confirm("do you want to remove this member!")) {
+                        const memberId = e.target.parentNode.parentNode.id;
+                        axios.delete(`http://localhost:3000/group/admin/member/${memberId}?groupId=${currentGrpId}`, {
+                            headers: {
+                                Authorization: usertoken,
+                            }
+                        }).then(res => {
+                            if (res.status === 200) {
+                                alert("removed successfully");
+                                window.location.reload();
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                            alert("failed to remove memeber!!")
+                        })
+                    }
+                }
+            })
+        }
+    }).catch(err => {
+        console.log(err);
+        alert("failed to fetch memebers!!")
+    })
+}
+
+function showGroupMembersInHtml(member, ul, admin) {
+    const div = document.createElement("div");
+    div.id = member.id;
+    div.className = "d-flex justify-center align-items-center w-100 gap-2"
+    div.style.overflowWrap = "break-word";
+    const li = document.createElement("li");
+    const h5 = document.createElement("h6");
+    const removeFromGroupbtn = document.createElement("button");
+    removeFromGroupbtn.title = `remove member`
+    removeFromGroupbtn.className = "btn h-100 remove member"
+    removeFromGroupbtn.innerHTML = `<i class="fas fa-trash removeFromGroup"></i>`;
+    const AdminIconGroup = document.createElement("button");
+    AdminIconGroup.title = `Group Admin`
+    AdminIconGroup.className = "btn h-100"
+    AdminIconGroup.innerHTML = `<i class="fa fa-lock" aria-hidden="true"></i>`;
+    h5.textContent = member.name;
+    h5.className = "w-100 overflow-auto"
+    div.appendChild(h5);
+    if (admin.has(member.id)) {
+        div.appendChild(AdminIconGroup);
+    }
+    if (admin.has(userData.id)) {
+        div.appendChild(removeFromGroupbtn);
+    }
+    li.appendChild(div);
+    ul.appendChild(li);
+    const hr = document.createElement("hr");
+    ul.appendChild(hr);
+}
+
+//if anywhere click close member popup 
+document.addEventListener('click', () => {
+    // Remove all items from the ul
+    const GroupmemberList = document.getElementById("allGroupMembersList");
+    while (GroupmemberList.firstChild) {
+        GroupmemberList.removeChild(GroupmemberList.firstChild);
+    }
+    while (searchedUserList.firstChild) {
+        searchedUserList.removeChild(searchedUserList.firstChild);
+    }
+});
+
 
 /**
  * Logout

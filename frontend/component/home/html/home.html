@@ -33,7 +33,7 @@
         <!-- Logo -->
         <a class="navbar-brand" href="#">
           <img
-            src="../../common/img/logo.png"
+            src="../../common/img/_0448d18a-eb1c-4f3e-bb9d-47bbfa6e8b7c.jpg"
             alt="chatty"
             width="50"
             height="50"
@@ -46,35 +46,43 @@
             id="createNewGroup"
             data-toggle="modal"
             data-target="#createGroupModal"
+            title="Create new group"
           >
-            Create Group
+            <i class="fas fa-plus"></i>
+            Group
           </li>
           <li class="nav-item navListItem" id="logout">Logout</li>
         </ul>
       </div>
     </nav>
+
     <main
       class="d-flex flex-row gap-2 w-100 justify-content-between px-3 overflow-hidden px-5"
     >
+      <!--Left side-->
       <div class="col-12 col-md-2 overflow-auto" id="chatUserNames">
-        <div class="input-group mb-1">
-          <input type="text" class="form-control" placeholder="search user" />
+        <div class="input-group mb-1 position-relative">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="search user"
+            id="searchedusername"
+          />
           <div class="input-group-append">
-            <button class="btn btn-outline-secondary sendbutton" type="button">
+            <button
+              class="btn btn-outline-secondary sendbutton"
+              type="button"
+              id="triggerSearchUser"
+            >
               <i class="fa fa-search" aria-hidden="true"></i>
             </button>
           </div>
         </div>
-        <!-- <div style="position: relative; z-index: 1 ;margin: 0;">
-          <ul style="position: absolute; background: white; width: 100%">
-            <li>a</li>
-            <li>b</li>
-            <li>a</li>
-            <li>b</li>
-            <li>a</li>
-            <li>b</li>
-          </ul>
-        </div> -->
+        <ul
+          class="position-absolute border-1 border-dark px-2 w-auto"
+          id="searchedUserList"
+        ></ul>
+        <!--sended list-->
         <ul
           class="p-0 m-1 d-flex justify-content-center flex-column gap-1"
           id="chatUserNamesList"
@@ -89,29 +97,28 @@
           </li> -->
         </ul>
       </div>
-
+      <!--Right side-->
       <div class="col-12 col-md-10 d-none d-md-block" id="chatScreen">
-        <div class="d-none" title="leave Group" id="chatScreenHeader">
+        <!--Right side Head-->
+        <div class="d-none" id="chatScreenHeader">
           <div
             id="allGroupMembers"
             title="see all members"
-            style="position: relative; z-index: 1; margin: 0"
+            class="position-relative m-0"
           >
             <img src="../../common/img/people.png" height="25" width="25" />
-            <ul class="position-absolute bg-white border-1 border-dark">
-              <li>abc</li>
-              <li>b</li>
-              <li>a</li>
-              <li>b</li>
-              <li>a</li>
-              <li>b</li>
-            </ul>
+            <div>
+              <ul
+                class="position-absolute bg-white border-1 border-dark px-2"
+                id="allGroupMembersList"
+              ></ul>
+            </div>
           </div>
           <div id="leaveGroup" title="leave the group">
-            <img src="../../common/img/exit.png" height="25" width="25" />
+            <img src="../../common/img/exit.png" height="22" width="25" />
           </div>
         </div>
-        <!-- Messages -->
+        <!--Right side Body-->
         <div class="flex-grow-1 px-2" id="chatMessage">
           <button
             type="button"

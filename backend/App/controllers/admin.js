@@ -69,6 +69,7 @@ exports.addUserInGroup = async (req, res, next) => {
         }
         const group = { groupId, userId }
         await UserGroup.create(group, { transaction: t });
+        t.commit();
         res.status(200).json({ message: "added successfully" });
     } catch (err) {
         await t.rollback();

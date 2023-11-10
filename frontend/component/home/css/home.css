@@ -1,29 +1,26 @@
-home {
-  color: #1f1717;
-}
 #chatMessage {
+  background-color: var(--offgrey);
   height: 77vh !important;
+  margin-bottom: 1vh;
   overflow-y: scroll;
   scroll-behavior: smooth;
-  margin-bottom: 1vh;
-  background-color: rgba(217, 217, 219, 0.673);
 }
 
 #chatUserNames {
-  background-color: rgba(217, 217, 219, 0.673);
+  background-color: var(--offgrey);
 }
 #sendFile {
   cursor: pointer;
 }
 input:hover {
-  border-color: #1f1717;
+  border-color: var(--black);
 }
 
 .navbar {
-  border-bottom: 1px solid rgba(217, 217, 219, 0.673);
+  border-bottom: 1px solid var(--offgrey);
+  background-color: var(--white);
+  color: var(--black);
   z-index: 1px;
-  background-color: #f9f9f9;
-  color: #1f1717;
 }
 .navListItem {
   cursor: pointer;
@@ -32,18 +29,18 @@ input:hover {
   padding: 10px;
 }
 .navListItem:hover {
+  background-color: var(--offgrey);
+  color: var(--black);
   border-radius: 20px;
-  background-color: rgba(217, 217, 219, 0.673);
-  color: #1f1717;
 }
 
 .receiver {
-  background-color: #cacaca;
-  color: #1f1717;
+  background-color: var(--dkgrey);
+  color: var(--black);
 }
 .sendbutton {
-  background-color: #1f1717;
-  color: #fff !important;
+  background-color: var(--black);
+  color: var(--white) !important;
 }
 .chatuserimg {
   height: 26px;
@@ -54,7 +51,7 @@ input:hover {
   font-weight: 600;
 }
 .chatusernamelistitem {
-  background-color: #f8f9fa;
+  background-color: var(--white);
   width: 100%;
   border-radius: 10px;
   display: flex;
@@ -66,8 +63,24 @@ input:hover {
 }
 
 #chatUserNamesList li:hover {
-  background-color: #cacaca;
+  background-color: var(--dkgrey);
 }
 img {
   cursor: pointer;
+}
+
+#allGroupMembersList {
+  border-left: 1px solid var(--offgrey) !important;
+  border-right: 1px solid var(--offgrey) !important;
+  width: auto;
+  margin-top: 7px;
+}
+
+.fas {
+  color: var(--black);
+}
+
+#searchedUserList {
+  background-color: var(--dkgrey);
+  width: 15% !important;
 }
