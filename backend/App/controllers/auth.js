@@ -8,7 +8,7 @@ exports.registerUser = async (req, res, next) => {
     const t = await sequelize.transaction();
     try {
         const { name, email, phone, password, about } = req.body;
-        const { profile } = req.files;
+        const profile = req.files?.profile;
 
         if (!name || !email || !phone || !password) {
             return res.status(404).json({
@@ -40,9 +40,11 @@ exports.registerUser = async (req, res, next) => {
                 })
             }
             user.password = hash;
-            const url = await uploadToS3(profile.data, `profile/${profile.name}`);
-            // console.log(url);
-            user.profile = url;
+            if (profile) {
+                const url = await uploadToS3(profile.data, `profile/${profile.name}`);
+                // console.log(url);
+                user.profile = url;
+            }
             const newUser = await User.create(user, { transaction: t })
             await t.commit();
             res.status(200).json({
