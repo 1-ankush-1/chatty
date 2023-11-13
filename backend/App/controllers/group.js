@@ -181,19 +181,19 @@ exports.wantToAddInGroup = async (req, res, next) => {
                     let token = localStorage.getItem('chatToken');  // Fetch token from local storage
                     // console.log("token",token);
         
-                    axios.get('${process.env.ALLOWED_DOMAIN}:3000/group/admin/add_user?groupId=${groupId}', {
+                    axios.get('${process.env.ALLOWED_DOMAIN}/group/admin/add_user?groupId=${groupId}', {
                         headers: {
                             Authorization: token
                         }
                     }).then(res => {
                         if(res.status === 200){
-                            window.location.href = '${process.env.ALLOWED_DOMAIN}:5500/frontend/component/home/html/home.html';  // Redirect to home.html
+                            window.location.href = '${process.env.ALLOWED_DOMAIN}/frontend/component/home/html/home.html';  // Redirect to home.html
                         }
                     })
                     .catch(error => {
                         if (error.response && error.response.status === 401) {
                             alert('Login then try...'); 
-                            window.location.href = '${process.env.ALLOWED_DOMAIN}:5500/frontend/component/home/html/home.html'
+                            window.location.href = '${process.env.ALLOWED_DOMAIN}/frontend/component/home/html/home.html'
                         } else {
                             alert('Failed. Please try again.'); 
                         }
@@ -201,7 +201,7 @@ exports.wantToAddInGroup = async (req, res, next) => {
                 });
         
                 document.getElementById('noBtn').addEventListener('click', function() {
-                    window.location.href = '${process.env.ALLOWED_DOMAIN}:5500/frontend/component/home/html/home.html'
+                    window.location.href = '${process.env.ALLOWED_DOMAIN}/frontend/component/home/html/home.html'
                 });
             </script>
         </body>

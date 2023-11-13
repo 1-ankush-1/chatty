@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="../../common/css/index.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="../../common/css/form.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="../css/login.css"
+    />
+  </head>
+  <body>
+    <div class="mainBody d-flex justify-content-center align-items-center">
+      <main class="formStructure">
+        <div class="formStructure-head">
+          <h1 class="formStructure-head-name">
+            <span>L</span>
+            <span><img
+                id="spinImage"
+                src="../../common/img/_49948659-8af4-4b06-b43e-52682836f89f.jpg"
+                alt="spin"
+                class="mb-1"
+            /></span>
+            <span>G</span>
+            <span class="rotate">I</span>
+            <span>N</span>
+          </h1>
+        </div>
+
+        <form id="loginform">
+          <div class="form-outline mb-2">
+            <label for="email" class="form-check-label"> Email </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-control form-control-md"
+              required
+            />
+          </div>
+          <div class="form-outline mb-2">
+            <label for="password" class="form-check-label"> Password </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-control form-control-md"
+              required
+            />
+          </div>
+          <p class="text-danger mt-3 mb-0" id="passwordmessage" hidden>
+            password doesnot match confirm password
+          </p>
+          <div class="d-flex justify-content-center m-4">
+            <button
+              type="submit"
+              class="btn btn-md w-50 border-1 border-dark form-btn"
+            >
+              Login
+            </button>
+          </div>
+          <p class="text-center text-muted mt-3 mb-0">
+            <a href="./forgot.html" class="fw-bold text-body"
+              ><u>Forgot password ?</u></a
+            >
+          </p>
+          <p class="text-center text-muted mt-3 mb-0">
+            Don't have an Account ?
+            <a href="../../signup/html/signup.html" class="fw-bold text-body"
+              ><u>Create here</u></a
+            >
+          </p>
+        </form>
+      </main>
+    </div>
+    <!--JS-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="../js/login.js"></script>
+  </body>
+</html>

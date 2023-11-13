@@ -5,15 +5,23 @@ const Router = require("./App/routes/index.js")
 const sequelize = require("./App/config/connect.js");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
+const fs = require("fs")
+const path = require("path");
+const compression = require("compression");
+const morgan = require("morgan");
 
 const app = express();
-
+app.use(express.static('public'));
+const accessLogStream = fs.WriteStream(path.join(__dirname, 'access.log'), {
+    flag: 'a'
+});
 /**
  * Middlewares
  */
-
+app.use(compression());
+app.use(morgan('combined', { stream: accessLogStream }));
 app.use(cors({
-    origin: [`${process.env.ALLOWED_DOMAIN}:5500`],
+    origin: [`${process.env.ALLOWED_DOMAIN}`],
     methods: ['GET', 'POST', 'DELETE','PUT'],
     credentials: true
 }));
