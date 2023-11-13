@@ -47,11 +47,22 @@ function handelImageToSend(e) {
     e.preventDefault();
     const imageModel = document.getElementById("fileInput");
     imageModel.click();
-    imageModel.addEventListener("change", getImage);
+    imageModel.addEventListener("change", handleDisplayMessageImage);
 }
-function getImage(e) {
+
+function handleDisplayMessageImage(e) {
     let file = e.target.files[0];
-    console.log(file)
+    // Check if the file exists and is an image
+    if (file && file.type.startsWith('image/')) {
+        let reader = new FileReader();
+        reader.onload = function (e) {
+            document.querySelector('#textMsgImg').setAttribute('src', e.target.result);
+        }
+        reader.readAsDataURL(file);
+    } else if (file) {
+        // Handle non-image files here
+        alert("The file is not an image.");
+    }
 }
 
 /**
@@ -121,10 +132,15 @@ function addMessagesBeforeInHtml(message, ul) {
 function handleNewdMessages() {
     //get all the messages
     let userMessages = JSON.parse(localStorage.getItem("userMessages"));
-
     let lastMsgId = userMessages[userMessages.length - 1]?.id;
+    let queryString;
+    if (msgType === "group") {
+        queryString = `http://localhost:3000/message/msg-after-id/${lastMsgId}?groupId=${currentGrpId}`
+    } else {
+        queryString = `http://localhost:3000/message/msg-after-id/${lastMsgId}?receiverId=${currentuserId}`
+    }
     //messages after last message id
-    axios.get(`http://localhost:3000/message/msg-after-id/${lastMsgId}?groupId=${currentGrpId}`, {
+    axios.get(queryString, {
         headers: {
             Authorization: usertoken
         }
@@ -169,7 +185,6 @@ function handleNewdMessages() {
                     loadOldMessages.removeAttribute("hidden");
                 }
             }
-
         }
     }).catch(err => {
         console.log(err);
@@ -266,7 +281,33 @@ function showUserMessages() {
         }
     }).then(res => {
         if (res.status === 200) {
-            console.log(res);
+            //clear interval
+            clearInterval(myInterval);
+            const firstFetchMessages = res.data.data;
+            //add in locastorage
+            localStorage.setItem("userMessages", JSON.stringify([...firstFetchMessages].reverse()));
+            if (firstFetchMessages.length > 0) {
+                //add in html dom
+                console.log(firstFetchMessages);
+                for (let i = firstFetchMessages.length - 1; i >= 0; i--) {
+                    addMessagesInHtml(firstFetchMessages[i], unorderedChatBox);
+                }
+                //old message btn
+                if (firstFetchMessages.length >= maxMessages) {
+                    const loadOldMessages = document.getElementById("loadOldMessages");
+                    loadOldMessages.removeAttribute("hidden");
+                    loadOldMessages.addEventListener("click", handleOldMessages);
+                }
+                //set interval
+                myInterval = setInterval(handleNewdMessages, 5000);
+            }
+            else {
+                //no message found
+                const li = document.createElement("li");
+                li.textContent = "no messages ..."
+                li.className = "text-center"
+                unorderedChatBox.appendChild(li);
+            }
         }
     }).catch(err => {
         console.log(err);
@@ -333,10 +374,13 @@ function addChatInHtml(chat, chatType) {
     li.className = "d-flex justify-content-between chatusernamelistitem p-2 cursor-pointer"
     const div = document.createElement("div");
     if (chatType === "group") {
+        li.msgType = "group";
         sharebtn = document.createElement("button");
         sharebtn.className = "btn h-100"
         sharebtn.title = "Share group url"
         sharebtn.innerHTML = '<i class="fas fa-share-alt"></i>';
+    } else {
+        li.msgType = "user";
     }
     div.className = "d-flex justify-content-center flex-column align-center"
     const h3 = document.createElement("h6");
@@ -359,16 +403,19 @@ function addChatInHtml(chat, chatType) {
 
 function showMessages(e) {
     e.preventDefault();
-    console.log(msgType)
-    document.getElementById("chatScreenHeader").className = "d-flex justify-content-between p-2"
+    msgType = e.currentTarget.parentElement.msgType;
+    if (msgType === "group") {
+        document.getElementById("chatScreenHeader").className = "d-flex justify-content-between p-2"
+    } else {
+        document.getElementById("chatScreenHeader").className = "d-none"
+    }
     document.getElementById("sendMsg").removeAttribute("hidden");
 
     //cleare the messages of prev group
     clearMessageScreeen();
-
     const loadOldMessages = document.getElementById("loadOldMessages");
     loadOldMessages.setAttribute("hidden", "");
-    if (msgType === "group") {
+    if (e.currentTarget.parentElement.msgType === "group") {
         currentGrpId = e.currentTarget.parentElement.cid;
         fetchMessages();
     } else {
@@ -439,7 +486,7 @@ function fetchGroups() {
 //generate link to share
 function handleShareGroup(e) {
     e.preventDefault();
-    let link = `http://localhost:3000/group/add_request/?groupId=${e.currentTarget.parentElement.id}`;
+    let link = `http://localhost:3000/group/add_request/?groupId=${e.currentTarget.parentElement.cid}`;
     navigator.clipboard.writeText(link)
         .then(() => {
             alert(`Share your link: '${link}'\n\nIt has also been copied to your clipboard do: Cntrl+v.`);
@@ -505,6 +552,44 @@ function handleGroupMember(e) {
             ul.addEventListener('click', (e) => {
                 // Stop the propagation of the click event
                 e.stopPropagation();
+                if (e.target.className.includes('makeadmin')) {
+                    if (confirm(`do you want to Make ${e.target.textContent} admin!`)) {
+                        const memberId = e.target.parentNode.id;
+                        axios.put(`http://localhost:3000/group/admin/make_admin`, { userId: memberId, groupId: currentGrpId }, {
+                            headers: {
+                                Authorization: usertoken,
+                            }
+                        }).then(res => {
+                            if (res.status === 200) {
+                                alert("made admin successfully");
+                                window.location.reload();
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                            alert("failed to make memeber admin!!")
+                        })
+                    }
+                }
+
+                if (e.target.parentNode.className.includes('removeadmin') && e.target.className.includes('removeadminofgroup')) {
+                    if (confirm(`do you want to remove this member from admin of this group!`)) {
+                        const memberId = e.target.parentNode.parentNode.id;
+                        axios.put(`http://localhost:3000/group/admin/remove_admin`, { userId: memberId, groupId: currentGrpId }, {
+                            headers: {
+                                Authorization: usertoken,
+                            }
+                        }).then(res => {
+                            if (res.status === 200) {
+                                alert("removed admin successfully");
+                                window.location.reload();
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                            alert("failed to remove memeber from admin!!")
+                        })
+                    }
+                }
+
                 // Check if the clicked element is a button
                 console.log("hit", e.target.className)
                 if (e.target.parentNode.className.includes('remove member') && e.target.className.includes('removeFromGroup')) {
@@ -547,7 +632,7 @@ function showGroupMembersInHtml(member, ul, admin) {
     const AdminIconGroup = document.createElement("button");
     AdminIconGroup.title = `Group Admin`
     AdminIconGroup.className = "btn h-100"
-    AdminIconGroup.innerHTML = `<i class="fa fa-lock" aria-hidden="true"></i>`;
+    AdminIconGroup.innerHTML = `<i class="fa fa-lock removeadminofgroup" aria-hidden="true"></i>`;
     h5.textContent = member.name;
     h5.className = "w-100 overflow-auto"
     div.appendChild(h5);
@@ -555,6 +640,10 @@ function showGroupMembersInHtml(member, ul, admin) {
         div.appendChild(AdminIconGroup);
     }
     if (admin.has(userData.id)) {
+        h5.title = "make admin"
+        h5.className = "w-100 overflow-auto cursor-pointer makeadmin"
+        AdminIconGroup.className = "btn h-100 removeadmin"
+        AdminIconGroup.title = `remove Admin`
         div.appendChild(removeFromGroupbtn);
     }
     li.appendChild(div);

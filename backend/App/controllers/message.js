@@ -75,10 +75,20 @@ exports.getMessages = async (req, res, next) => {
             }
         } else if (data.receiverId) {
             queryConditions = {
-                senderId: userId,
-                receiverId: data.receiverId,
-                conversationType: "user"
+                [Op.or]: [
+                    {
+                        senderId: parseInt(userId),
+                        receiverId: parseInt(data.receiverId),
+                        conversationType: "user"
+                    },
+                    {
+                        senderId: parseInt(data.receiverId),
+                        receiverId: parseInt(userId),
+                        conversationType: "user",
+                    }
+                ]
             }
+
         } else {
             return res.status(404).json({
                 message: "empty parameters"
@@ -114,6 +124,7 @@ exports.getMessages = async (req, res, next) => {
 
 exports.getMessagesAfterId = async (req, res, next) => {
     try {
+        const userId = req.userId;
         const { id } = req.params;
         const data = req.query;
         //no query parameters
@@ -134,11 +145,24 @@ exports.getMessagesAfterId = async (req, res, next) => {
             }
         } else if (data.receiverId) {
             queryConditions = {
-                receiverId: data.receiverId,
-                conversationType: "user",
-                id: {
-                    [Op.gt]: id
-                }
+                [Op.or]: [
+                    {
+                        senderId: parseInt(userId),
+                        receiverId: parseInt(data.receiverId),
+                        conversationType: "user",
+                        id: {
+                            [Op.gt]: id
+                        }
+                    },
+                    {
+                        senderId: parseInt(data.receiverId),
+                        receiverId: parseInt(userId),
+                        conversationType: "user",
+                        id: {
+                            [Op.gt]: id
+                        }
+                    }
+                ]
             }
         } else {
             return res.status(404).json({
@@ -191,11 +215,24 @@ exports.getMessagesBeforeId = async (req, res, next) => {
             }
         } else if (data.receiverId) {
             queryConditions = {
-                receiverId: data.receiverId,
-                conversationType: "user",
-                id: {
-                    [Op.lt]: id
-                }
+                [Op.or]: [
+                    {
+                        senderId: parseInt(userId),
+                        receiverId: parseInt(data.receiverId),
+                        conversationType: "user",
+                        id: {
+                            [Op.lt]: id
+                        }
+                    },
+                    {
+                        senderId: parseInt(data.receiverId),
+                        receiverId: parseInt(userId),
+                        conversationType: "user",
+                        id: {
+                            [Op.lt]: id
+                        }
+                    }
+                ]
             }
         } else {
             return res.status(404).json({

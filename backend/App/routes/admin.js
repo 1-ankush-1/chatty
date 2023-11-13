@@ -6,6 +6,7 @@ const cookieAuthentication = require("../middlewares/authenticateCookie");
 
 router.delete("/member/:id", Authentication, adminController.removeMemberFromGroup);
 router.get("/add_user", cookieAuthentication, Authentication, adminController.addUserInGroup);
-router.post("/make_admin", Authentication, adminController.creatingAdminOfGroup);
+router.put("/make_admin", Authentication, adminController.creatingAdminOfGroup);
+router.put("/remove_admin", Authentication, adminController.removeAdminOfGroup);
 
 module.exports = router;

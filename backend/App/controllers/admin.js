@@ -17,6 +17,7 @@ exports.creatingAdminOfGroup = async (req, res, next) => {
         }
         group.isAdmin = true;
         await group.save({ transaction: t });
+        console.log(group);
         t.commit();
         res.status(200).json({
             message: "admin created successfully"
@@ -25,6 +26,31 @@ exports.creatingAdminOfGroup = async (req, res, next) => {
         await t.rollback();
         console.log(`${err} in removeMemberFromGroup`)
         return res.status(500).json({ message: "failed to remove memeber from group" });
+    }
+};
+
+exports.removeAdminOfGroup = async (req, res, next) => {
+    const t = await sequelize.transaction();
+    try {
+        const { groupId, userId } = req.body;
+        if (groupId === null || userId === null) {
+            return res.status(404).json({ message: "empty Credentials" });
+        }
+        const group = await groupWithUserExist(groupId, userId, t);
+
+        if (!group) {
+            return res.status(404).json({ message: "no user exist" });
+        }
+        group.isAdmin = false;
+        await group.save({ transaction: t });
+        t.commit();
+        res.status(200).json({
+            message: "admin removed successfully"
+        })
+    } catch (err) {
+        await t.rollback();
+        console.log(`${err} in removeAdminOfGroup`)
+        return res.status(500).json({ message: "failed to remove admin of group" });
     }
 };
 

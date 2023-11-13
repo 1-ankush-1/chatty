@@ -67,6 +67,7 @@
             class="form-control"
             placeholder="search user"
             id="searchedusername"
+            title="search new user"
           />
           <div class="input-group-append">
             <button
@@ -132,11 +133,11 @@
           <ul class="p-0 overflow-auto" id="chatMessageList"></ul>
           <!-- Your messages go here -->
         </div>
-
         <!-- Message input box and button -->
         <div class="mt-auto">
           <div class="form-group" id="sendMsg" hidden>
             <form id="sendMsgForm">
+              <img id="textMsgImg" height="30px" width="30px" hidden />
               <div class="input-group gap-2">
                 <input
                   type="text"
@@ -145,7 +146,12 @@
                   placeholder="Enter your message"
                 />
                 <div id="sendFile" title="sendFile">
-                  <input type="file" id="fileInput" style="display: none" />
+                  <input
+                    type="file"
+                    id="fileInput"
+                    style="display: none"
+                    accept="image/*,.pdf,.doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  />
                   <img
                     src="../../common/img/multimedia.png"
                     alt="chatty"
