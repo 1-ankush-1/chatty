@@ -3,6 +3,7 @@ const cookieAuthentication = (req, res, next) => {
     try {
         // console.log("got in here", req.cookies);
         const cookietoken = req.cookies.authToken;
+        console.log(req.cookies)
         if (!cookietoken) {
             return res.status(404).json({ message: "try again" });
         }

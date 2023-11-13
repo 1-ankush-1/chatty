@@ -85,7 +85,7 @@ exports.addUserInGroup = async (req, res, next) => {
     const t = await sequelize.transaction();
     try {
         const { groupId } = req.query;
-        const userId = req.userId;
+        const userId = req.query.userId ?? req.userId;
         if (groupId === null || userId === null) {
             return res.status(404).json({ message: "empty Credentials" });
         }

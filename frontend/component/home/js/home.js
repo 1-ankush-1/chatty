@@ -363,6 +363,63 @@ function handleSelectedSearchUser(e) {
     addChatInHtml(chat);
 }
 
+/**Search N Add member */
+const triggeraddmember = document.getElementById("triggeraddmember")
+triggeraddmember.addEventListener("click", handleSearchedMember);
+const searchedMemberList = document.getElementById("searchedMemberList");
+
+function handleSearchedMember(e) {
+    e.preventDefault();
+    const name = document.getElementById("Addmember");
+    axios.get(`http://localhost:3000/user/by_name/${name.value}`, {
+        headers: {
+            Authorization: usertoken
+        }
+    }).then(res => {
+        if (res.status === 200) {
+            console.log(res)
+            for (let user of res.data.data) {
+                placeSearchedMemberInHtml(user);
+            }
+        }
+    }).catch(err => {
+        console.log(err);
+        alert("failed to search members in group");
+    })
+}
+
+function placeSearchedMemberInHtml(user) {
+    const li = document.createElement("li");
+    li.className = "d-flex justify-content-between p-2 cursor-pointer bg-white"
+    li.id = user.id;
+    li.textContent = user.name;
+    li.addEventListener("click", handleAddMemberInGroup)
+    searchedMemberList.appendChild(li);
+    const hr = document.createElement("hr");
+    searchedMemberList.appendChild(hr);
+}
+
+function handleAddMemberInGroup(e) {
+    e.preventDefault();
+    let id = e.target.id;
+    if (confirm("do you want to add this user in group")) {
+        axios.get(`http://localhost:3000/group/admin/add_user?groupId=${currentGrpId}&userId=${id} `, {
+            headers: {
+                Authorization: usertoken
+            },
+            withCredentials: true
+        }).then(res => {
+            if (res.status === 200) {
+                alert("member added successfully")
+                document.getElementById("Addmember").value = "";
+            }
+        }).catch(err => {
+            console.log(err);
+            alert("failed to add members in group");
+        })
+    }
+}
+
 /**
  * Common in User N Group
  */
@@ -545,7 +602,11 @@ function handleGroupMember(e) {
             const ul = document.getElementById("allGroupMembersList");
             //set of adminid for searching
             const admin = new Set(allMembers.filter(member => member.isAdmin).map(member => member.id));
-
+            if (admin.has(userData.id)) {
+                document.getElementById("addMembersInIndividualGroup").removeAttribute("hidden");
+            } else {
+                document.getElementById("addMembersInIndividualGroup").setAttribute("hidden","");
+            }
             for (let member of allMembers) {
                 showGroupMembersInHtml(member, ul, admin)
             }
@@ -644,6 +705,7 @@ function showGroupMembersInHtml(member, ul, admin) {
         h5.className = "w-100 overflow-auto cursor-pointer makeadmin"
         AdminIconGroup.className = "btn h-100 removeadmin"
         AdminIconGroup.title = `remove Admin`
+        addMembersInIndividualGroup
         div.appendChild(removeFromGroupbtn);
     }
     li.appendChild(div);
@@ -661,6 +723,9 @@ document.addEventListener('click', () => {
     }
     while (searchedUserList.firstChild) {
         searchedUserList.removeChild(searchedUserList.firstChild);
+    }
+    while (searchedMemberList.children[0]) {
+        searchedMemberList.removeChild(searchedMemberList.children[0])
     }
 });
 
