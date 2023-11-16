@@ -1,6 +1,6 @@
 #chatMessage {
   background-color: var(--offgrey);
-  height: 77vh !important;
+  height: 76vh !important;
   margin-bottom: 1vh;
   overflow-y: scroll;
   scroll-behavior: smooth;
@@ -81,6 +81,11 @@ img {
 }
 
 #searchedUserList {
-  background-color: var(--dkgrey);
+  background-color: var(--white);
   width: 15% !important;
+}
+
+.dropdown-menu[data-bs-popper] {
+  right: 0;
+  left: auto;
 }

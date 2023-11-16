@@ -1,0 +1,16 @@
+
+1) store profile (images)
+    -- can store how many images
+    -- how to store images
+        - store image as file or Blog(binary large object)
+            mutatbility - does image got change                 |no       
+            ,transaction - ACID                                 |no
+            ,indexes(searching) - do we need to search content  |no
+            ,access control - access control mechanism          |no
+
+            with file system are cheaper,faster,these are static (can create CDN),file will store in database
+
+2) direct messaging 
+    -- 
+
+

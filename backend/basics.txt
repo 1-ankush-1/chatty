@@ -1,0 +1,38 @@
+const io = require('socket')(3000)
+
+io.on('connection',socket => {
+    console.log(socket.id)
+})
+
+
+namespace - similar to routes
+
+        const newIo = io.of("/new")   -> it will route it to new route
+        newIo.on('connection',socket => {
+            console.log(socket.id)
+        })
+
+middleware - perform a middleware action
+
+        newIo.use((socket,next)=>{
+            socket.on("middle",()=>{
+
+            })
+            next();
+        })
+
+auth with middleware- 
+
+        pass the auth from client
+        io("http://localhost:3000/new",{auth:{token:"anytoken"}})
+
+        handel error on client
+        user.on('connect_error',(err)=>{
+            console.log(err)
+        })
+
+        handel the auth on server
+        newIo.use((socket,next)=>{
+            console.log(socket.handshake.auth.token)    // do the authentication with token this token
+            next();
+        })

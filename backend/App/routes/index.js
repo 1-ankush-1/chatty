@@ -15,7 +15,6 @@ router.use("/message", Authentication, messageRoutes);
 router.use("/group", groupRoutes);
 
 //if no route found
-//if no route found
 router.use('/', (req, res, next) => {
     //get file path
     let filePath = path.join(__dirname, `../../public/components/${req.url}`);

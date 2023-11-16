@@ -28,31 +28,137 @@
     />
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-collapse">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid px-3">
         <!-- Logo -->
         <a class="navbar-brand" href="#">
           <img
-            src="../../common/img/_0448d18a-eb1c-4f3e-bb9d-47bbfa6e8b7c.jpg"
+            src="../../common/img/logo.png"
             alt="chatty"
-            width="50"
-            height="50"
-            class="opacity-100"
+            width="50px"
+            height="50px"
           />
         </a>
-        <ul class="d-flex align-items-center gap-4">
-          <li
-            class="nav-item navListItem"
-            id="createNewGroup"
-            data-toggle="modal"
-            data-target="#createGroupModal"
-            title="Create new group"
-          >
-            <i class="fas fa-plus"></i>
-            Group
-          </li>
-          <li class="nav-item navListItem" id="logout">Logout</li>
-        </ul>
+        <button
+          class="navbar-toggler border-0"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse flex-grow-0" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item mx-3 mt-2">
+              <div class="input-group mb-1 position-relative">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="search friend"
+                  id="searchedusername"
+                  title="search new user"
+                />
+                <div class="input-group-append">
+                  <button
+                    class="btn btn-outline-secondary sendbutton"
+                    type="button"
+                    id="triggerSearchUser"
+                  >
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+              <ul
+                class="position-absolute border-1 border-dark px-2 w-auto"
+                id="searchedUserList"
+              ></ul>
+            </li>
+            <li class="nav-item mx-3" title="create Group">
+              <a
+                class="nav-link navListItem"
+                href="#"
+                id="createNewGroup"
+                data-toggle="modal"
+                data-target="#createGroupModal"
+                ><img
+                  src="../../common/img/addGroup.png"
+                  height="25px"
+                  width="25px"
+              /></a>
+            </li>
+            <li class="nav-item mx-3" title="All friendRequests">
+              <div class="navListItem position-relative" id="friendRequest">
+                <img
+                  src="../../common/img/request.png"
+                  height="25px"
+                  width="25px"
+                />
+              </div>
+              <ul
+                class="position-absolute border-1 border-dark px-2 w-auto bg-white"
+                id="friendRequestList"
+              ></ul>
+            </li>
+
+            <li class="nav-item dropdown mx-3">
+              <a
+                class="nav-link dropdown-toggle navListItem"
+                href="#"
+                id="navbarDropdownMenuLink"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <img
+                  src="../../common/img/profile.png"
+                  height="25px"
+                  width="25px"
+                />
+              </a>
+              <ul
+                class="dropdown-menu"
+                aria-labelledby="navbarDropdownMenuLink"
+              >
+                <li
+                  class="nav-item m-2 d-lg-flex align-items-center justify-content-center"
+                  title="profile"
+                >
+                  <a class="nav-link navListItem" href="#" id="profile"
+                    ><img
+                      src="../../common/img/profile.png"
+                      height="25px"
+                      width="25px"
+                  /></a>
+                </li>
+                <li
+                  class="nav-item m-2 d-lg-flex align-items-center justify-content-center"
+                  title="settings"
+                >
+                  <a class="nav-link navListItem" href="#" id="settings"
+                    ><img
+                      src="../../common/img/settings.png"
+                      height="25px"
+                      width="25px"
+                  /></a>
+                </li>
+                <li
+                  class="nav-item m-2 d-lg-flex align-items-center justify-content-center"
+                  title="logout"
+                >
+                  <a
+                    class="nav-link navListItem bg-danger rounded-pill"
+                    href="#"
+                    id="logout"
+                    >Logout</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
 
@@ -61,28 +167,6 @@
     >
       <!--Left side-->
       <div class="col-12 col-md-2 overflow-auto" id="chatUserNames">
-        <div class="input-group mb-1 position-relative">
-          <input
-            type="text"
-            class="form-control"
-            placeholder="search user"
-            id="searchedusername"
-            title="search new user"
-          />
-          <div class="input-group-append">
-            <button
-              class="btn btn-outline-secondary sendbutton"
-              type="button"
-              id="triggerSearchUser"
-            >
-              <i class="fa fa-search" aria-hidden="true"></i>
-            </button>
-          </div>
-        </div>
-        <ul
-          class="position-absolute border-1 border-dark px-2 w-auto"
-          id="searchedUserList"
-        ></ul>
         <!--sended list-->
         <ul
           class="p-0 m-1 d-flex justify-content-center flex-column gap-1"
@@ -142,7 +226,11 @@
             </div>
           </div>
           <div id="leaveGroup" title="leave the group">
-            <img src="../../common/img/exit.png" height="22" width="25" />
+            <img
+              src="../../common/img/icons8-leave-50.png"
+              height="25"
+              width="25"
+            />
           </div>
         </div>
         <!--Right side Body-->
@@ -179,10 +267,10 @@
                     accept="image/*,.pdf,.doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                   />
                   <img
-                    src="../../common/img/multimedia.png"
+                    src="../../common/img/icons8-multimedia-64.png"
                     alt="chatty"
-                    width="35"
-                    height="35"
+                    width="40"
+                    height="40"
                     id="imageToSend"
                   />
                 </div>
@@ -246,6 +334,7 @@
       integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="../js/home.js"></script>
   </body>

@@ -1,3 +1,8 @@
+const socket = io("http://localhost:3000")
+socket.on('connect', () => {
+    console.log(socket.id);
+})
+
 let msgType = "user";
 const userData = JSON.parse(localStorage.getItem("userData"));
 const usertoken = localStorage.getItem("chatToken");
@@ -9,6 +14,7 @@ async function onloadData() {
         if (!usertoken) {
             window.location.href = "../../login/html/login.html";
         }
+        console.log("innn");
         //fetch all the messages
         fetchGroups();
     } catch (err) {
@@ -255,6 +261,8 @@ function handlesendMsgForm(e) {
     } else {
         messageContent = { text: message.value, receiverId: currentuserId }
     }
+
+    io("http://localhost:3000/message/send", { message: messageContent });
     axios.post("http://localhost:3000/message/send", messageContent, {
         headers: {
             Authorization: usertoken
@@ -346,7 +354,18 @@ function placeSearchedUserInHtml(user) {
     const li = document.createElement("li");
     li.className = "d-flex justify-content-between p-2 cursor-pointer"
     li.id = user.id;
-    li.textContent = user.name;
+    const h6 = document.createElement("h6");
+    h6.textContent = user.name;
+    const img = document.createElement("img");
+    img.src = "../../common/img/sendFriendReques.png"
+    img.alt = user.name.slice(0, 6);
+    img.setAttribute("height", "25px")
+    img.setAttribute("width", "25px")
+    img.title = "send Friend Request"
+    li.appendChild(h6);
+    li.appendChild(img);
+    img.addEventListener("click", handelSendFriendRequest);
+    // li.textContent = user.name;
     li.addEventListener("click", handleSelectedSearchUser)
     searchedUserList.appendChild(li);
     const hr = document.createElement("hr");
@@ -361,6 +380,116 @@ function handleSelectedSearchUser(e) {
     let desc = "something";
     const chat = { id, name, desc }
     addChatInHtml(chat);
+}
+/**
+ * Friend Request
+ */
+const friendRequest = document.getElementById("friendRequest")
+const friendRequestList = document.getElementById("friendRequestList");
+friendRequest.addEventListener("click", getAllFriendRequest);
+
+function getAllFriendRequest(e) {
+    e.preventDefault();
+
+    axios.get(`http://localhost:3000/user/friend_request`, {
+        headers: {
+            Authorization: usertoken
+        }
+    }).then(res => {
+        console.log(res);
+        if (res.status === 200) {
+            const allrequests = res.data.data;
+            for (let req of allrequests) {
+                addFriendRequestInHtml(req);
+            }
+        }
+    }).catch(err => {
+        console.log(err);
+        alert("failed to get friend Request");
+    });
+
+}
+
+function addFriendRequestInHtml(user) {
+    const li = document.createElement("li");
+    li.className = "d-flex justify-content-between p-2 cursor-pointer align-items-center gap-3"
+    li.id = user.id;
+    //head
+    const h6 = document.createElement("h6");
+    h6.textContent = user.name;
+    //body
+    const div = document.createElement("div");
+    div.className = "d-flex justify-content-between align-items-center gap-2"
+    const approve = document.createElement("img");
+    approve.src = "../../common/img/icons8-done-48.png"
+    approve.alt = "accepted";
+    approve.setAttribute("height", "20px")
+    approve.setAttribute("width", "20px")
+    approve.title = "accept request"
+
+    const reject = document.createElement("img");
+    reject.src = "../../common/img/icons8-close-48.png"
+    reject.alt = "rejected";
+    reject.setAttribute("height", "20px")
+    reject.setAttribute("width", "20px")
+    reject.title = "reject request"
+
+    //append body
+    div.appendChild(approve);
+    div.appendChild(reject);
+    //append structure
+    li.appendChild(h6);
+    li.appendChild(div);
+
+    approve.addEventListener("click", handelFriendRequest);
+    reject.addEventListener("click", handelFriendRequest);
+
+    li.addEventListener("click", handleSelectedSearchUser)
+    friendRequestList.appendChild(li);
+    const hr = document.createElement("hr");
+    friendRequestList.appendChild(hr);
+}
+
+
+function handelFriendRequest(e) {
+    e.preventDefault();
+    const status = e.target.alt;
+    const contactId = e.target.parentElement.parentElement.id;
+
+    if (status) {
+        axios.put(`http://localhost:3000/user/friend_request/handle/${contactId}`, { status }, {
+            headers: {
+                Authorization: usertoken
+            }
+        }).then(res => {
+            console.log(res);
+            if (res.status === 200) {
+                alert(`friend request ${status} successfully`)
+            }
+        }).catch(err => {
+            console.log(err);
+            alert(`failed to ${status} friend Request`);
+        });
+    }
+}
+
+function handelSendFriendRequest(e) {
+    e.preventDefault();
+    const contactUserId = e.target.parentElement.id;
+
+    axios.post(`http://localhost:3000/user/friend_request/send`, { contactUserId }, {
+        headers: {
+            Authorization: usertoken
+        }
+    }).then(res => {
+        console.log(res);
+        if (res.status === 200) {
+            alert("friend request send successfully")
+        }
+    }).catch(err => {
+        console.log(err);
+        alert("failed to send friend Request");
+    });
 }
 
 /**Search N Add member */
@@ -605,7 +734,7 @@ function handleGroupMember(e) {
             if (admin.has(userData.id)) {
                 document.getElementById("addMembersInIndividualGroup").removeAttribute("hidden");
             } else {
-                document.getElementById("addMembersInIndividualGroup").setAttribute("hidden","");
+                document.getElementById("addMembersInIndividualGroup").setAttribute("hidden", "");
             }
             for (let member of allMembers) {
                 showGroupMembersInHtml(member, ul, admin)
@@ -726,6 +855,9 @@ document.addEventListener('click', () => {
     }
     while (searchedMemberList.children[0]) {
         searchedMemberList.removeChild(searchedMemberList.children[0])
+    }
+    while (friendRequestList.firstChild) {
+        friendRequestList.removeChild(friendRequestList.firstChild);
     }
 });
 

@@ -1,3 +1,4 @@
+const http = require("http");
 const express = require("express");
 const bodyparser = require("body-parser");
 const cors = require("cors");
@@ -9,8 +10,13 @@ const fs = require("fs")
 const path = require("path");
 const compression = require("compression");
 const morgan = require("morgan");
+const socketIo = require("socket.io");
 
+//setup server
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
 app.use(express.static('public'));
 const accessLogStream = fs.WriteStream(path.join(__dirname, 'access.log'), {
     flag: 'a'
@@ -22,7 +28,7 @@ app.use(compression());
 app.use(morgan('combined', { stream: accessLogStream }));
 app.use(cors({
     origin: [`${process.env.ALLOWED_DOMAIN}`],
-    methods: ['GET', 'POST', 'DELETE','PUT'],
+    methods: ['GET', 'POST', 'DELETE', 'PUT'],
     credentials: true
 }));
 app.use(cookieParser());
@@ -38,7 +44,17 @@ app.use(
 /**
  * Routes
  */
+// app.use((req, res, next) => {
+//     req.io = io;
+//     return next();
+// });
 app.use(Router);
+
+/**
+ * io handeler
+ */
+const msgIo = io.of("/message");
+
 
 /**
  * sync with database
@@ -47,7 +63,7 @@ sequelize.sync().then(() => {
     /**
     * start server
     */
-    app.listen(process.env.port || 3000, () => {
+    server.listen(process.env.port || 3000, () => {
         console.log(`server is running on http://localhost:${process.env.port || 3000}`)
     })
 }).catch(err => {
