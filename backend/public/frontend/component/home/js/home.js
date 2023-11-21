@@ -697,7 +697,8 @@ function handleSearchedMember(e) {
 
 function placeSearchedMemberInHtml(user) {
     const li = document.createElement("li");
-    li.className = "d-flex justify-content-between p-2 cursor-pointer bg-white"
+    li.className = "d-flex justify-content-between p-2 cursor-pointer"
+    li.title = "add user"
     li.id = user.id;
     li.textContent = user.name;
     li.addEventListener("click", handleAddMemberInGroup)
