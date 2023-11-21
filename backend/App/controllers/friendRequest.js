@@ -1,4 +1,4 @@
-const { AppConfigData } = require("aws-sdk");
+
 const { User, Contact } = require("../models");
 const sequelize = require("../config/connect");
 const { Op } = require("sequelize");
@@ -47,7 +47,7 @@ exports.sendRequest = async (req, res, next) => {
             res.status(404).json({
                 message: "user missing"
             })
-            return;  // Stop execution if user is missing
+            return;
         }
 
         //request exist - then no need to create new request
@@ -69,7 +69,7 @@ exports.sendRequest = async (req, res, next) => {
         if (request) {
             if (request.status === "rejected") {
                 request.status = "pending";
-                await request.save({ transaction: t });  // Wait for the save operation to complete
+                await request.save({ transaction: t });
                 await t.commit();
                 return res.status(200).json({
                     message: "Friend Request send Successfully"
@@ -98,7 +98,7 @@ exports.sendRequest = async (req, res, next) => {
     } catch (err) {
         await t.rollback();
         console.log(`${err} in sendRequest`)
-        res.status(500).json({ message: err.message });  // Send the error message in the response
+        res.status(500).json({ message: err.message });
     }
 }
 
@@ -126,7 +126,7 @@ exports.handleRequest = async (req, res, next) => {
                     }]
             }, transaction: t
         })
-        console.log(updatedContact);
+        // console.log(updatedContact);
         await t.commit();
         res.status(200).json({
             message: `request succesfully ${status}`,
