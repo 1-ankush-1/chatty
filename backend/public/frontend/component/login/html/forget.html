@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>forget Password</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -33,22 +33,10 @@
     <div class="mainBody">
       <main class="formStructure">
         <div class="formStructure-head">
-          <h1 class="formStructure-head-name">
-            <span>L</span>
-            <span
-              ><img
-                id="spinImage"
-                src="../../common/img/_49948659-8af4-4b06-b43e-52682836f89f.jpg"
-                alt="spin"
-                class="mb-1"
-            /></span>
-            <span>G</span>
-            <span class="rotate">I</span>
-            <span>N</span>
-          </h1>
+          <h2 class="formStructure-head-name">Forget PASSWORD</h2>
         </div>
 
-        <form id="loginform">
+        <form id="forgetform">
           <div class="form-outline mb-2">
             <label for="email" class="form-check-label"> Email </label>
             <input
@@ -59,36 +47,21 @@
               required
             />
           </div>
-          <div class="form-outline mb-2">
-            <label for="password" class="form-check-label"> Password </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              class="form-control form-control-md"
-              required
-            />
-          </div>
           <p class="text-danger mt-3 mb-0" id="passwordmessage" hidden>
-            password doesnot match confirm password
+            User Not Exist
           </p>
           <div class="d-flex justify-content-center m-4">
             <button
               type="submit"
               class="btn btn-md w-50 border-1 border-dark form-btn"
             >
-              Login
+              Send
             </button>
           </div>
           <p class="text-center text-muted mt-3 mb-0">
-            <a href="./forget.html" class="fw-bold text-body"
-              ><u>Forget password ?</u></a
-            >
-          </p>
-          <p class="text-center text-muted mt-3 mb-0">
-            Don't have an Account ?
-            <a href="../../signup/html/signup.html" class="fw-bold text-body"
-              ><u>Create here</u></a
+            know password ?
+            <a href="../html/login.html" class="fw-bold text-body"
+              ><u>Login Here</u></a
             >
           </p>
         </form>
@@ -101,6 +74,6 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="../js/login.js"></script>
+    <script src="../js/forget.js"></script>
   </body>
 </html>

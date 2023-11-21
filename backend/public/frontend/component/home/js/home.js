@@ -739,9 +739,9 @@ function addChatInHtml(chat, chatType) {
     li.className = "d-flex justify-content-between chatusernamelistitem p-2 cursor-pointer"
     const div = document.createElement("div");
     // if (chatType === "group") {
-    console.log(chat.type)
+    // console.log(chat.type)
     if (chat.type === "group" || chatType === "group") {
-        console.log("in")
+        // console.log("in")
         li.msgType = "group";
         sharebtn = document.createElement("button");
         sharebtn.className = "btn h-100"

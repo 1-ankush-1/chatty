@@ -1,6 +1,9 @@
-#profileDisplay{
-    border-radius: 75px;
+#profileDisplay {
+  border-radius: 75px;
 }
-hr{
-    margin: 10px;
+hr {
+  margin: 10px;
+}
+body {
+  height: 100vh;
 }

@@ -7,6 +7,9 @@
   width: 30px;
   animation: spin 3s infinite linear;
 }
+body {
+  height: 100vh !important;
+}
 
 @keyframes spin {
   0% {
