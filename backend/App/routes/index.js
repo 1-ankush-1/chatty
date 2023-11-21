@@ -11,20 +11,17 @@ const fs = require("fs")
 //all routes
 router.use("/auth", authRoutes);
 router.use("/user", Authentication, userRoutes);
-router.use("/message", Authentication, messageRoutes);
 router.use("/group", groupRoutes);
+// router.use("/message",Authentication, messageRoutes);
 
 //if no route found
 router.use('/', (req, res, next) => {
-    //get file path
-    let filePath = path.join(__dirname, `../../public/components/${req.url}`);
+    let filePath = path.join(__dirname, `../../public/components/${req.url}`);    //get file path
 
     //check if the path exists
     fs.access(filePath, fs.constants.F_OK, (err) => {
-        //if not or path is root, redirect to login page
-        if (err || req.url === "/") {
-            //adding absolute path so it doesnt add relative path in other request
-            res.redirect(`${process.env.ALLOWED_DOMAIN}/frontend/component/login/html/login.html`);
+        if (err || req.url === "/") {                                           //if not or path is root, redirect to login page
+            res.redirect(`${process.env.ALLOWED_DOMAIN}/frontend/component/login/html/login.html`);   //adding absolute path so it doesnt add relative path in other request
         } else {
             res.sendFile(filePath);
         }
