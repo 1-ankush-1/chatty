@@ -5,11 +5,20 @@
   --offgrey: rgba(217, 217, 219, 0.673);
   --shadow: rgba(9, 9, 47, 0.673);
   --dkgrey: #cacaca;
-  --grey: #f8f9fa;
+  --grey: #F0EFED;
   --white: #f7f8fa;
   --font-size: 1.1rem;
   --mono: "Oxygen mono", monospace;
   --sans: "Montserrat", sans-serif;
+}
+
+body.dark-mode {
+  --black: #f7f8fa;
+  --offgrey: rgba(38, 38, 36, 0.673);
+  --shadow: rgba(246, 246, 208, 0.673);
+  --dkgrey: #353535;
+  --grey: #070707;
+  --white: #1f1717;
 }
 
 html {

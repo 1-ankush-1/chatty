@@ -11,11 +11,14 @@ const path = require("path");
 const compression = require("compression");
 const morgan = require("morgan");
 const socketIo = require("socket.io");
+const handleMessages = require("../backend/App/middlewares/handleMessages.js")
 
 //setup server
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+    maxHttpBufferSize: 6e6 // size slightly above 5 MB
+});
 
 app.use(express.static('public'));
 const accessLogStream = fs.WriteStream(path.join(__dirname, 'access.log'), {
@@ -29,7 +32,7 @@ app.use(morgan('combined', { stream: accessLogStream }));
 app.use(cors({
     origin: [`${process.env.ALLOWED_DOMAIN}`],
     methods: ['GET', 'POST', 'DELETE', 'PUT'],
-    credentials: true
+    credentials: true                       //for cookie
 }));
 app.use(cookieParser());
 app.use(bodyparser.json({ extended: false }));
@@ -44,17 +47,13 @@ app.use(
 /**
  * Routes
  */
-// app.use((req, res, next) => {
-//     req.io = io;
-//     return next();
-// });
 app.use(Router);
 
 /**
- * io handeler
+ * io handelers
  */
 const msgIo = io.of("/message");
-
+handleMessages(msgIo);
 
 /**
  * sync with database

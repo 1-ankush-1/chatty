@@ -4,10 +4,22 @@
   margin-bottom: 1vh;
   overflow-y: scroll;
   scroll-behavior: smooth;
+  /* background-image: url("../../common/img/_9675db9c-2133-4bdd-bfba-70b3120ef755.jpg"); */
+  /* background-position: center; 
+  background-repeat: no-repeat;
+  background-size: cover;  */
+}
+#noOfFriendRequest {
+  right: 10px;
+  bottom: 5px;
 }
 
 #chatUserNames {
   background-color: var(--offgrey);
+  height: 85vh !important;
+  margin-bottom: 1vh;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
 }
 #sendFile {
   cursor: pointer;
@@ -35,8 +47,14 @@ input:hover {
 }
 
 .receiver {
-  background-color: var(--dkgrey);
-  color: var(--black);
+  background-color: var(--dkgrey) !important;
+  color: var(--black) !important;
+  overflow-wrap: anywhere;
+}
+.sender {
+  background-color: var(--grey) !important;
+  overflow-wrap: anywhere;
+  color: var(--black) !important;
 }
 .sendbutton {
   background-color: var(--black);
@@ -58,7 +76,8 @@ input:hover {
   align-items: center;
 }
 
-#chatMessage::-webkit-scrollbar {
+#chatMessage::-webkit-scrollbar,
+#chatUserNames::-webkit-scrollbar {
   display: none;
 }
 
@@ -88,4 +107,42 @@ img {
 .dropdown-menu[data-bs-popper] {
   right: 0;
   left: auto;
+}
+.document-pos-relative {
+  bottom: 40px !important;
+  left: 180px !important;
+}
+.font-dark {
+  font-weight: 500;
+}
+
+#chatMessageList {
+  padding: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+body {
+  transition: background-color 0.5s ease;
+}
+
+/* bg-light */
+nav {
+  background-color: var(--white) !important;
+  color: var(--black);
+}
+input {
+  background-color: var(--white) !important;
+  color: var(--black) !important;
+}
+/* i {
+  color: var(--black) !important;
+} */
+body {
+  background-color: var(--white) !important;
+  color: var(--black);
+}
+ul {
+  background-color: var(--white) !important;
+  color: var(--black);
 }

@@ -1,20 +1,48 @@
-const socket = io("http://localhost:3000")
-socket.on('connect', () => {
-    console.log(socket.id);
-})
-
+const socket = io("http://localhost:3000/message");
 let msgType = "user";
+let maxMessages = 20;
+let currentuserId;
+let currentGrpId;
+let myInterval;
+let noOfRequest = 0;
+let noOfFriendRequest = document.getElementById("noOfFriendRequest");
+noOfFriendRequest.textContent = 0;
+// let lastSeenInterval;
 const userData = JSON.parse(localStorage.getItem("userData"));
 const usertoken = localStorage.getItem("chatToken");
-let myInterval;
-let maxMessages = 20;
+
+const darkMode = document.getElementById("darkMode");
+document.getElementById('colorTheme').addEventListener('click', function (e) {
+    const isDarkMode = document.body.classList.toggle('dark-mode');
+    document.body.classList.toggle('light-mode');
+    const img = document.getElementById('colorImage');
+    img.src = isDarkMode ? '../../common/img/icons8-sun-48 (1).png' : '../../common/img/icons8-moon-30.png';
+    e.target.parentElement.style.backgroundColor = isDarkMode ? "black" : "white"
+});
+
+
+socket.on('connect', function () {
+    socket.emit('lastseen', { id: userData.id });
+    socket.off("noOfRequest");
+    socket.on("noOfRequest", (body) => {
+        try {
+            // console.log(body);
+            noOfRequest = body?.count ? body.count : 0;
+            noOfFriendRequest.textContent = noOfRequest;
+        } catch (err) {
+            console.log(err);
+        }
+    })
+    socket.emit("noOfRequest", { id: userData.id });
+});
+// // When user disconnects
+// clearInterval(lastSeenInterval);
 
 async function onloadData() {
     try {
         if (!usertoken) {
             window.location.href = "../../login/html/login.html";
         }
-        console.log("innn");
         //fetch all the messages
         fetchGroups();
     } catch (err) {
@@ -36,18 +64,19 @@ const unorderedChatBox = document.getElementById("chatMessageList");
 /**
  * turn on polling
  */
-parentChatBoxDiv.onscroll = () => {
-    if (myInterval) {
-        clearInterval(myInterval);  // Clear the existing interval
-        if (parentChatBoxDiv.scrollTop + parentChatBoxDiv.clientHeight + 2 >= parentChatBoxDiv.scrollHeight) {
-            myInterval = setInterval(handleNewdMessages, 5000);  // Set a new interval
-        }
-    }
-}
+// parentChatBoxDiv.onscroll = () => {
+//     if (myInterval) {
+//         clearInterval(myInterval);  // Clear the existing interval
+//         if (parentChatBoxDiv.scrollTop + parentChatBoxDiv.clientHeight + 2 >= parentChatBoxDiv.scrollHeight) {
+//             myInterval = setInterval(handleNewdMessages, 5000);  // Set a new interval
+//         }
+//     }
+// }
 
 /**
  * image
  */
+let attachement;
 document.getElementById("imageToSend").addEventListener("click", handelImageToSend)
 function handelImageToSend(e) {
     e.preventDefault();
@@ -59,15 +88,21 @@ function handelImageToSend(e) {
 function handleDisplayMessageImage(e) {
     let file = e.target.files[0];
     // Check if the file exists and is an image
-    if (file && file.type.startsWith('image/')) {
+    // if (file && file.type.startsWith('image/')) {
+    if (file) {
         let reader = new FileReader();
         reader.onload = function (e) {
             document.querySelector('#textMsgImg').setAttribute('src', e.target.result);
+            // Emit the file name and data
+            attachement = { name: file.name, data: e.target.result };
+            //putting file name in input field of message
+            document.getElementById("message").value = file.name;
         }
         reader.readAsDataURL(file);
-    } else if (file) {
-        // Handle non-image files here
-        alert("The file is not an image.");
+        // } else if (file) {
+        //     // Handle non-image files here
+        //     alert("The file is not an image.");
+        // }
     }
 }
 
@@ -77,57 +112,75 @@ function handleDisplayMessageImage(e) {
 function handleOldMessages() {
     //localstorage first id
     let userMessages = JSON.parse(localStorage.getItem("userMessages"));
-    // console.log(userMessages[0].id)
-    axios.get(`http://localhost:3000/message/msg-before-id/${userMessages[0].id}?groupId=${currentGrpId}`, {
-        headers: {
-            Authorization: usertoken
-        }
-    }).then(res => {
-        if (res.status === 200) {
+    let body = { id: userMessages[0].id };
+    if (currentGrpId) {
+        body["groupId"] = currentGrpId;
+    } else {
+        body["receiverId"] = currentuserId;
+    }
+
+    socket.emit("receivemsg-before-id", body)
+
+    socket.on("receivemsg-before-id", (result) => {
+        try {
             const loadOldMessages = document.getElementById("loadOldMessages");
             loadOldMessages.removeAttribute("hidden");
-            const messages = res.data.data;
+            const messages = result.data;
             let oldmsglength = messages.length
-            if (oldmsglength > 0) {
-                //stop the polling
-                clearInterval(myInterval);
 
-                // Remove old messages from the back
-                if (userMessages.length > oldmsglength) {
-                    userMessages = userMessages.slice(0, userMessages.length - oldmsglength);
-                }
-                // Add old messages to the front
-                userMessages = messages.concat(userMessages);
-                localStorage.setItem("userMessages", JSON.stringify(userMessages));
-
-                // Remove from DOM
-                while (unorderedChatBox.hasChildNodes() && oldmsglength > 0) {
-                    unorderedChatBox.removeChild(unorderedChatBox.lastChild);
-                    oldmsglength--;
-                }
-
-                // Add elements to the DOM
-                for (let i = messages.length - 1; i >= 0; i--) {
-                    addMessagesBeforeInHtml(messages[i], unorderedChatBox);
-                }
-                parentChatBoxDiv.appendChild(unorderedChatBox);
+            // Remove old messages from the back
+            if (userMessages.length > oldmsglength) {
+                userMessages = userMessages.slice(0, userMessages.length - oldmsglength);
             }
-            console.log(res.data.oldmessages, "call");
+            // Add old messages to the front
+            userMessages = messages.concat(userMessages);
+            localStorage.setItem("userMessages", JSON.stringify(userMessages));
+
+            // Remove from DOM
+            // while (unorderedChatBox.hasChildNodes() && oldmsglength > 0) {
+            //     unorderedChatBox.removeChild(unorderedChatBox.lastChild);
+            //     oldmsglength--;
+            // }
+
+            // Add elements to the DOM
+            for (let i = messages.length - 1; i >= 0; i--) {
+                addMessagesBeforeInHtml(messages[i], unorderedChatBox);
+            }
+            parentChatBoxDiv.appendChild(unorderedChatBox);
+
+            // console.log(res.data.oldmessages, "call");
             //old message flag
-            if (res.data.oldmessages) {
+            if (!result.oldmessages) {
                 loadOldMessages.setAttribute("hidden", "");
             }
+        } catch (err) {
+            console.log(err);
         }
-    }).catch(err => {
-        console.log(err);
     })
 }
 
 function addMessagesBeforeInHtml(message, ul) {
+    // console.log(message);
+    const time = msgTimer(message.updatedAt);
     const li = document.createElement("li");
     li.id = message.id;
-    li.className = (message.userId === userData.id) ? "p-2 my-2 bg-light text-wrap rounded text-start text-lg" : "p-2 my-2 text-wrap rounded text-end receiver text-lg";
-    li.textContent = message.text;
+    li.className = (message.senderId === userData.id) ? "d-flex justify-content-start align-items-center gap-2" : "d-flex justify-content-end align-items-center gap-2";
+
+    const wrapper = document.createElement("div");
+    // wrapper.className = (message.senderId === userData.id) ? "p-2 my-2 bg-light text-wrap rounded text-start" : "p-2 my-2 text-wrap rounded text-end receiver";
+
+    const h5 = document.createElement("h5");
+    h5.textContent = message.text
+    h5.className = (message.senderId === userData.id) ? "p-2 m-2 text-wrap rounded text-start sender" : "p-2 m-2 text-wrap rounded text-end receiver"
+    h5.style.whiteSpace = 'normal';
+    wrapper.appendChild(h5); // Add the h5 to the wrapper
+
+    const small = document.createElement("small");
+    small.textContent = time
+    small.className = "text-2 d-block mx-3";
+    wrapper.appendChild(small); // Add the small to the wrapper
+
+    li.appendChild(wrapper); // Add the wrapper to the div
     ul.prepend(li);
 }
 
@@ -181,7 +234,7 @@ function handleNewdMessages() {
 
                 // Add elements to the DOM
                 for (let msg of messages) {
-                    addMessagesInHtml(msg, unorderedChatBox);
+                    addChatMessagesInHtml(msg, unorderedChatBox);
                 }
                 parentChatBoxDiv.appendChild(unorderedChatBox);
 
@@ -198,32 +251,42 @@ function handleNewdMessages() {
 }
 
 
-function fetchMessages() {
-    axios.get(`http://localhost:3000/message/receive/?groupId=${currentGrpId}`, {
-        headers: {
-            Authorization: usertoken
-        }
-    }).then(res => {
-        if (res.status === 200) {
-            //clear interval
-            clearInterval(myInterval);
-            const firstFetchMessages = res.data.data;
+function fetchMessages(to) {
+    document.getElementById("addMembersInIndividualGroup").setAttribute("hidden", "");
+    socket.emit("receivemsg", to);
+    socket.on("receivemsg", (result) => {
+        try {
+            if (!result) {
+                return
+            }
+            //attachement to null
+            attachement = null;
+            document.getElementById("message").value = ""
+            //remove html
+            while (unorderedChatBox.firstChild) {
+                unorderedChatBox.removeChild(unorderedChatBox.firstChild);
+            }
+            //data
+            const firstFetchMessages = result.data;
             //add in locastorage
             localStorage.setItem("userMessages", JSON.stringify([...firstFetchMessages].reverse()));
+
             if (firstFetchMessages.length > 0) {
                 //add in html dom
-                console.log(firstFetchMessages);
                 for (let i = firstFetchMessages.length - 1; i >= 0; i--) {
-                    addMessagesInHtml(firstFetchMessages[i], unorderedChatBox);
+                    if (firstFetchMessages[i].fileUrl === null) {
+                        addChatMessagesInHtml(firstFetchMessages[i], unorderedChatBox);
+                    } else {
+                        displayImageInMsgHtml(firstFetchMessages[i], unorderedChatBox)
+                    }
                 }
                 //old message btn
-                if (firstFetchMessages.length >= maxMessages) {
+                if (result.oldmessages) {
+                    // if (firstFetchMessages.length >= maxMessages) {
                     const loadOldMessages = document.getElementById("loadOldMessages");
                     loadOldMessages.removeAttribute("hidden");
                     loadOldMessages.addEventListener("click", handleOldMessages);
                 }
-                //set interval
-                myInterval = setInterval(handleNewdMessages, 5000);
             }
             else {
                 //no message found
@@ -232,18 +295,56 @@ function fetchMessages() {
                 li.className = "text-center"
                 unorderedChatBox.appendChild(li);
             }
+        } catch (err) {
+            console.log(err);
         }
-    }).catch(err => {
-        console.log(err);
     })
 }
 
-function addMessagesInHtml(message, ul) {
+function addChatMessagesInHtml(message, ul) {
+
+    const time = msgTimer(message.updatedAt);
+    // console.log(time);
     const li = document.createElement("li");
     li.id = message.id;
-    li.className = (message.senderId === userData.id) ? "p-2 my-2 bg-light text-wrap rounded text-start text-lg" : "p-2 my-2 text-wrap rounded text-end receiver text-lg";
-    li.textContent = message.text;
+    li.className = (message.senderId === userData.id) ? "d-flex justify-content-start align-items-center gap-2" : "d-flex justify-content-end align-items-center gap-2";
+
+    const wrapper = document.createElement("div");
+
+    const h5 = document.createElement("h5");
+    h5.textContent = message.text
+    h5.className = (message.senderId === userData.id) ? "p-2 mt-2 mb-1 mx-2 bg-light text-wrap rounded text-start sender" : "p-2 mt-2 mb-1 mx-2 text-wrap rounded text-end receiver"
+    wrapper.appendChild(h5); // Add the h5 to the wrapper
+
+    const small = document.createElement("small");
+    small.textContent = time
+    small.className = "text-2 d-block mx-3";
+    wrapper.appendChild(small); // Add the small to the wrapper
+
+    li.appendChild(wrapper); // Add the wrapper to the div
+
     ul.appendChild(li);
+}
+
+function msgTimer(time) {
+    let updatedAt = new Date(time);
+    let currDate = new Date();
+    let diff = currDate - updatedAt; // Difference in milliseconds
+
+    let seconds = Math.floor(diff / 1000); // Convert to seconds
+    let minutes = Math.floor(seconds / 60); // Convert to minutes
+    let hours = Math.floor(minutes / 60); // Convert to hours
+    let days = Math.floor(hours / 24); // Convert to days
+
+    if (days > 0) {
+        // If the message was updated yesterday or earlier, show the number of days and the time
+        let updatedTime = updatedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        time = days + 'd ' + updatedTime;
+    } else {
+        // If the message was updated today, just show the time
+        time = updatedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    }
+    return time;
 }
 
 /**
@@ -255,72 +356,131 @@ sendMsgForm.addEventListener("submit", handlesendMsgForm);
 function handlesendMsgForm(e) {
     e.preventDefault();
     const message = document.getElementById("message");
-    let messageContent;
+    let messageContent = { text: message.value };
     if (msgType === "group") {
-        messageContent = { text: message.value, groupId: currentGrpId }
+        messageContent["groupId"] = currentGrpId
     } else {
-        messageContent = { text: message.value, receiverId: currentuserId }
+        messageContent["receiverId"] = currentuserId
     }
+    // console.log("what")
+    messageContent.type = msgType;
+    messageContent.file = attachement;
+    if (attachement) {
+        // console.log("in")
+        messageContent.text = "";
+    }
+    // console.log("out",messageContent)
+    // return
+    //to stop being called displaySendMessages listener multiple times
+    // console.log(messageContent);
+    socket.off("sendmsg");
+    displaySendMessages()
+    socket.emit("sendmsg", messageContent);
+}
 
-    io("http://localhost:3000/message/send", { message: messageContent });
-    axios.post("http://localhost:3000/message/send", messageContent, {
-        headers: {
-            Authorization: usertoken
-        }
-    }).then(res => {
-        if (res.status === 200) {
-            // alert("successfully send message")
-            e.target.reset();
-        }
-    }).catch(err => {
-        console.log(err);
-        alert("failed to send msg")
-    })
+function displaySendMessages() {
+    // console.log("called");
+    socket.on("sendmsg", (msg) => {
+        try {
+            let shouldDisplay = false;
+            attachement = null;
+            if (currentGrpId === null && msg?.groupId === undefined) {
+                // One-to-one messaging
+                if (currentuserId === msg.senderId || currentuserId === msg.receiverId) {
+                    shouldDisplay = true;
+                }
+            } else if (msg.groupId === currentGrpId) {
+                // Group messaging
+                shouldDisplay = true;
+            }
+
+            if (shouldDisplay) {
+                // Display message
+                if (msg.fileUrl === null || msg.fileUrl === undefined) {
+                    addChatMessagesInHtml(msg, unorderedChatBox);
+                } else {
+                    displayImageInMsgHtml(msg, unorderedChatBox)
+                }
+                sendMsgForm.reset();
+                // console.log(document.body.scrollHeight)
+                parentChatBoxDiv.scrollTo(0, document.body.scrollHeight);
+            }
+        } catch (err) { console.log(err) }
+    });
+}
+function displayImageInMsgHtml(message, ul) {
+    //file sets
+    const imageExtensions = new Set(['jpg', 'jpeg', 'png', 'gif', 'bmp']);
+    const fileExtensions = new Set(['pdf', 'doc', 'docx', 'xml']);
+
+    //get name and extension
+    // console.log(message.fileUrl);
+    const pathComponents = message.fileUrl.split("/");
+    const name = pathComponents[pathComponents.length - 1];
+    const nameComponents = name.split(".");
+    const extension = nameComponents[nameComponents.length - 1];
+
+    //time
+    const time = msgTimer(message.updatedAt);
+
+    //item
+    const li = document.createElement("li");
+    li.id = message.id;
+    li.className = (message.senderId === userData.id) ? "d-flex justify-content-start align-items-center gap-2" : "d-flex justify-content-end align-items-center gap-2";
+
+    const wrapper = document.createElement("div");
+
+    const div = document.createElement("div");
+    div.className = (message.senderId === userData.id) ? "p-3 mt-2 mb-1 mx-2 bg-light text-wrap rounded text-start position-relative sender" : "p-3  mt-2 mb-1 mx-2 text-wrap rounded text-end receiver position-relative";
+    const filename = document.createElement("h6");
+    const object = document.createElement("object");
+    object.setAttribute("height", "200px");
+    object.setAttribute("width", "200px");
+    if (imageExtensions.has(extension)) {
+        object.data = message.fileUrl;
+        object.className = "cursor-pointer"
+    } else if (fileExtensions.has(extension)) {
+        object.data = "../../common/img/pdf.png"
+        filename.textContent = name;
+    }
+    object.textContent = name;
+    const p = document.createElement("p");
+    p.textContent = "This browser does not support this File Format. Please download the file to view it:";
+    const a = document.createElement("a");
+    a.href = message.fileUrl
+    a.textContent = "Download"
+    p.appendChild(a);
+    object.appendChild(p);
+    const downloadIcon = document.createElement("a");
+    downloadIcon.href = message.fileUrl;
+    downloadIcon.download = name;
+    const icon = document.createElement("img");
+    if (li.classList.contains("text-start")) {
+        icon.className = "position-absolute document-pos-relative cursor-pointer"
+    }
+    icon.src = "../../common/img/icons8-download-26.png"
+    icon.alt = "download"
+    icon.setAttribute("height", "20px");
+    icon.setAttribute("width", "20px");
+    icon.title = "download"
+    downloadIcon.appendChild(icon);
+
+    const small = document.createElement("small");
+    small.textContent = time
+    small.className = "text-2 d-block mx-3";
+
+    div.appendChild(object);
+    div.appendChild(filename);
+    div.appendChild(downloadIcon);
+    wrapper.appendChild(div);
+    wrapper.appendChild(small);
+    li.appendChild(wrapper);
+    // console.log(li)
+    ul.appendChild(li);
 }
 /**
  * User
  */
-let currentuserId;
-function showUserMessages() {
-    //fetch all the messages of that user
-    axios.get(`http://localhost:3000/message/receive/?receiverId=${currentuserId}`, {
-        headers: {
-            Authorization: usertoken
-        }
-    }).then(res => {
-        if (res.status === 200) {
-            //clear interval
-            clearInterval(myInterval);
-            const firstFetchMessages = res.data.data;
-            //add in locastorage
-            localStorage.setItem("userMessages", JSON.stringify([...firstFetchMessages].reverse()));
-            if (firstFetchMessages.length > 0) {
-                //add in html dom
-                console.log(firstFetchMessages);
-                for (let i = firstFetchMessages.length - 1; i >= 0; i--) {
-                    addMessagesInHtml(firstFetchMessages[i], unorderedChatBox);
-                }
-                //old message btn
-                if (firstFetchMessages.length >= maxMessages) {
-                    const loadOldMessages = document.getElementById("loadOldMessages");
-                    loadOldMessages.removeAttribute("hidden");
-                    loadOldMessages.addEventListener("click", handleOldMessages);
-                }
-                //set interval
-                myInterval = setInterval(handleNewdMessages, 5000);
-            }
-            else {
-                //no message found
-                const li = document.createElement("li");
-                li.textContent = "no messages ..."
-                li.className = "text-center"
-                unorderedChatBox.appendChild(li);
-            }
-        }
-    }).catch(err => {
-        console.log(err);
-    })
-}
 
 
 /**
@@ -339,7 +499,7 @@ function handleSearchedUser(e) {
         }
     }).then(res => {
         if (res.status === 200) {
-            console.log(res)
+            // console.log(res)
             for (let user of res.data.data) {
                 placeSearchedUserInHtml(user);
             }
@@ -366,7 +526,7 @@ function placeSearchedUserInHtml(user) {
     li.appendChild(img);
     img.addEventListener("click", handelSendFriendRequest);
     // li.textContent = user.name;
-    li.addEventListener("click", handleSelectedSearchUser)
+    // li.addEventListener("click", handleSelectedSearchUser)
     searchedUserList.appendChild(li);
     const hr = document.createElement("hr");
     searchedUserList.appendChild(hr);
@@ -374,12 +534,12 @@ function placeSearchedUserInHtml(user) {
 
 function handleSelectedSearchUser(e) {
     e.preventDefault();
-    console.log("clicked", e.target);
+    // console.log("clicked", e.target);
     let id = e.target.id;
     let name = e.target.textContent;
     let desc = "something";
     const chat = { id, name, desc }
-    addChatInHtml(chat);
+    addChatInHtml(chat, "user");
 }
 /**
  * Friend Request
@@ -396,7 +556,7 @@ function getAllFriendRequest(e) {
             Authorization: usertoken
         }
     }).then(res => {
-        console.log(res);
+        // console.log(res);
         if (res.status === 200) {
             const allrequests = res.data.data;
             for (let req of allrequests) {
@@ -444,7 +604,7 @@ function addFriendRequestInHtml(user) {
     approve.addEventListener("click", handelFriendRequest);
     reject.addEventListener("click", handelFriendRequest);
 
-    li.addEventListener("click", handleSelectedSearchUser)
+    // li.addEventListener("click", handleSelectedSearchUser)
     friendRequestList.appendChild(li);
     const hr = document.createElement("hr");
     friendRequestList.appendChild(hr);
@@ -462,7 +622,7 @@ function handelFriendRequest(e) {
                 Authorization: usertoken
             }
         }).then(res => {
-            console.log(res);
+            // console.log(res);
             if (res.status === 200) {
                 alert(`friend request ${status} successfully`)
             }
@@ -477,19 +637,37 @@ function handelSendFriendRequest(e) {
     e.preventDefault();
     const contactUserId = e.target.parentElement.id;
 
-    axios.post(`http://localhost:3000/user/friend_request/send`, { contactUserId }, {
-        headers: {
-            Authorization: usertoken
+    // socket.off("sendrequest");
+    socket.emit("sendrequest", { contactUserId });
+
+    socket.on("sendrequest", (msg) => {
+        try {
+            if (!msg) {
+                return
+            }
+
+            if (noOfRequest < msg.data.length) {
+                noOfRequest = msg.data.length;
+                document.getElementById("noOfFriendRequest").value = noOfRequest
+            }
+        } catch (err) {
+            console.log(err);
         }
-    }).then(res => {
-        console.log(res);
-        if (res.status === 200) {
-            alert("friend request send successfully")
-        }
-    }).catch(err => {
-        console.log(err);
-        alert("failed to send friend Request");
-    });
+    })
+
+    // axios.post(`http://localhost:3000/user/friend_request/send`, { contactUserId }, {
+    //     headers: {
+    //         Authorization: usertoken
+    //     }
+    // }).then(res => {
+    //     // console.log(res);
+    //     if (res.status === 200) {
+    //         alert("friend request send successfully")
+    //     }
+    // }).catch(err => {
+    //     console.log(err);
+    //     alert("failed to send friend Request");
+    // });
 }
 
 /**Search N Add member */
@@ -506,7 +684,7 @@ function handleSearchedMember(e) {
         }
     }).then(res => {
         if (res.status === 200) {
-            console.log(res)
+            // console.log(res)
             for (let user of res.data.data) {
                 placeSearchedMemberInHtml(user);
             }
@@ -554,12 +732,16 @@ function handleAddMemberInGroup(e) {
  */
 function addChatInHtml(chat, chatType) {
     let sharebtn;
+    let seen = document.createElement("small");
     const ul = document.getElementById("chatUserNamesList");
     const li = document.createElement("li");
     li.cid = chat.id
     li.className = "d-flex justify-content-between chatusernamelistitem p-2 cursor-pointer"
     const div = document.createElement("div");
-    if (chatType === "group") {
+    // if (chatType === "group") {
+    console.log(chat.type)
+    if (chat.type === "group" || chatType === "group") {
+        console.log("in")
         li.msgType = "group";
         sharebtn = document.createElement("button");
         sharebtn.className = "btn h-100"
@@ -567,6 +749,20 @@ function addChatInHtml(chat, chatType) {
         sharebtn.innerHTML = '<i class="fas fa-share-alt"></i>';
     } else {
         li.msgType = "user";
+        const time = msgTimer(chat.lastSeen);
+        let now = new Date();
+        let lastSeen = new Date(chat.lastSeen);
+
+        // Round to nearest minute
+        now.setSeconds(0, 0);
+        lastSeen.setSeconds(0, 0);
+
+        if (now.getTime() === lastSeen.getTime()) {
+            seen.textContent = "online";
+        } else {
+            seen.textContent = time;
+        }
+
     }
     div.className = "d-flex justify-content-center flex-column align-center"
     const h3 = document.createElement("h6");
@@ -574,17 +770,20 @@ function addChatInHtml(chat, chatType) {
     h3.textContent = chat.name
     const p = document.createElement("p");
     p.className = "word-wrap te"
-    p.title = chat.desc;
-    p.textContent = chat.desc.substring(0, 11) + ".."
+    // p.title = chat.desc;
+    // p.textContent = chat.desc.substring(0, 11) + ".."
     div.appendChild(h3);
-    div.appendChild(p);
+    div.appendChild(seen);
+    // div.appendChild(p);
     div.addEventListener("click", showMessages);
     li.appendChild(div);
-    if (chatType === "group") {
+    if (chat.type === "group" || chatType === "group") {
+        // if (chatType === "group") {
         sharebtn.addEventListener("click", handleShareGroup);
         li.appendChild(sharebtn);
     }
     ul.prepend(li)
+    chatType = "";
 }
 
 function showMessages(e) {
@@ -603,10 +802,12 @@ function showMessages(e) {
     loadOldMessages.setAttribute("hidden", "");
     if (e.currentTarget.parentElement.msgType === "group") {
         currentGrpId = e.currentTarget.parentElement.cid;
-        fetchMessages();
+        currentuserId = null
+        fetchMessages({ groupId: currentGrpId })
     } else {
         currentuserId = e.currentTarget.parentElement.cid;
-        showUserMessages();
+        currentGrpId = null
+        fetchMessages({ receiverId: currentuserId })
     }
 }
 
@@ -616,7 +817,7 @@ function showMessages(e) {
 const createNewGroup = document.getElementById("createNewGroup");
 const GroupModel = new bootstrap.Modal(document.getElementById('createGroupModal'))
 const closeModel = document.getElementById("closeModel");
-let currentGrpId;
+
 
 createNewGroup.addEventListener("click", () => {
     GroupModel.show()
@@ -641,7 +842,7 @@ function handleGroupModalForm(e) {
         if (res.status === 200) {
             alert("successfully created group");
             GroupModel.hide();
-            addChatInHtml(res.data.data);
+            addChatInHtml(res.data.data, "group");
         }
     }).catch(err => {
         console.log(err);
@@ -660,7 +861,7 @@ function fetchGroups() {
             const userGroups = res.data.data;
             // userGroups = 
             for (let grp of userGroups) {
-                addChatInHtml(grp, "group");
+                addChatInHtml(grp);
             }
         }
     }).catch(err => {
@@ -759,6 +960,7 @@ function handleGroupMember(e) {
                             alert("failed to make memeber admin!!")
                         })
                     }
+                    return;
                 }
 
                 if (e.target.parentNode.className.includes('removeadmin') && e.target.className.includes('removeadminofgroup')) {
@@ -778,10 +980,11 @@ function handleGroupMember(e) {
                             alert("failed to remove memeber from admin!!")
                         })
                     }
+                    return;
                 }
 
                 // Check if the clicked element is a button
-                console.log("hit", e.target.className)
+                // console.log("hit", e.target.className)
                 if (e.target.parentNode.className.includes('remove member') && e.target.className.includes('removeFromGroup')) {
                     if (confirm("do you want to remove this member!")) {
                         const memberId = e.target.parentNode.parentNode.id;
@@ -799,6 +1002,7 @@ function handleGroupMember(e) {
                             alert("failed to remove memeber!!")
                         })
                     }
+                    return;
                 }
             })
         }

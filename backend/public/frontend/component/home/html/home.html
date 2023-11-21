@@ -28,17 +28,22 @@
     />
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg">
       <div class="container-fluid px-3">
         <!-- Logo -->
-        <a class="navbar-brand" href="#">
-          <img
-            src="../../common/img/logo.png"
-            alt="chatty"
-            width="50px"
-            height="50px"
-          />
-        </a>
+        <div>
+          <a class="navbar-brand" href="#">
+            <img
+              src="../../common/img/logo.png"
+              alt="chatty"
+              width="50px"
+              height="50px"
+            />
+            <button id="colorTheme" class="light-mode border-0">
+              <img src="../../common/img/icons8-moon-30.png" id="colorImage" />
+            </button>
+          </a>
+        </div>
         <button
           class="navbar-toggler border-0"
           type="button"
@@ -83,11 +88,13 @@
                 id="createNewGroup"
                 data-toggle="modal"
                 data-target="#createGroupModal"
-                ><img
+              >
+                <img
                   src="../../common/img/addGroup.png"
                   height="25px"
                   width="25px"
-              /></a>
+                />
+              </a>
             </li>
             <li class="nav-item mx-3" title="All friendRequests">
               <div class="navListItem position-relative" id="friendRequest">
@@ -96,13 +103,15 @@
                   height="25px"
                   width="25px"
                 />
+                <small id="noOfFriendRequest" class="position-relative"
+                  >0</small
+                >
               </div>
               <ul
-                class="position-absolute border-1 border-dark px-2 w-auto bg-white"
+                class="position-absolute border-1 border-dark px-2 w-auto"
                 id="friendRequestList"
               ></ul>
             </li>
-
             <li class="nav-item dropdown mx-3">
               <a
                 class="nav-link dropdown-toggle navListItem"
@@ -166,7 +175,7 @@
       class="d-flex flex-row gap-2 w-100 justify-content-between px-3 overflow-hidden px-5"
     >
       <!--Left side-->
-      <div class="col-12 col-md-2 overflow-auto" id="chatUserNames">
+      <div class="col-12 col-md-2" id="chatUserNames">
         <!--sended list-->
         <ul
           class="p-0 m-1 d-flex justify-content-center flex-column gap-1"
@@ -195,7 +204,7 @@
               <img src="../../common/img/people.png" height="25" width="25" />
               <div>
                 <ul
-                  class="position-absolute bg-white border-1 border-dark px-2"
+                  class="position-absolute border-1 border-dark px-2"
                   id="allGroupMembersList"
                 ></ul>
               </div>
@@ -244,7 +253,7 @@
           >
             old messages
           </button>
-          <ul class="p-0 overflow-auto" id="chatMessageList"></ul>
+          <ul id="chatMessageList"></ul>
           <!-- Your messages go here -->
         </div>
         <!-- Message input box and button -->
