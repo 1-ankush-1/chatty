@@ -875,13 +875,36 @@ function fetchGroups() {
 function handleShareGroup(e) {
     e.preventDefault();
     let link = `http://52.73.149.108/group/add_request/?groupId=${e.currentTarget.parentElement.cid}`;
-    navigator.clipboard.writeText(link)
-        .then(() => {
-            alert(`Share your link: '${link}'\n\nIt has also been copied to your clipboard do: Cntrl+v.`);
-        })
-        .catch(err => {
-            console.error('Could not copy text: ', err);
-        });
+
+
+    if (!navigator.clipboard) {
+        //only work with https
+        navigator.clipboard.writeText(link)
+            .then(() => {
+                alert(`Share your link: '${link}'\n\nIt has also been copied to your clipboard do: Cntrl+v.`);
+            })
+            .catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+    } else {
+        // Otherwise fallback to the above function
+        unsecuredCopyToClipboard(link);
+    }
+}
+
+function unsecuredCopyToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        alert(`Share your link: '${text}'\n\nIt has also been copied to your clipboard do: Cntrl+v.`);
+    } catch (err) {
+        console.error('Unable to copy to clipboard', err);
+    }
+    document.body.removeChild(textArea);
 }
 
 function clearMessageScreeen() {
