@@ -11,7 +11,8 @@ const path = require("path");
 const compression = require("compression");
 const morgan = require("morgan");
 const socketIo = require("socket.io");
-const handleMessages = require("../backend/App/middlewares/handleMessages.js")
+const handleMessages = require("../backend/App/middlewares/handleMessages.js");
+const { archieveMessages } = require("./App/middlewares/archieveMessages.js");
 
 //setup server
 const app = express();
@@ -54,6 +55,13 @@ app.use(Router);
  */
 const msgIo = io.of("/message");
 handleMessages(msgIo);
+
+/**
+ * Archieve chat 
+ */
+archieveMessages().then(() => {
+    console.log("Message archieved successfully")
+});
 
 /**
  * sync with database

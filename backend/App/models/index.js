@@ -4,6 +4,7 @@ const Group = require("./group");
 const UserGroup = require('./usergroup');
 const Contact = require('./contact');
 const ForgetPasswordRequest = require('./forgetPassword');
+const ArchivedChat = require("./archivedChat")
 
 User.hasMany(ForgetPasswordRequest);
 ForgetPasswordRequest.belongsTo(User);
@@ -20,4 +21,10 @@ Group.belongsToMany(User, { through: UserGroup });
 Group.hasMany(Message);
 Message.belongsTo(Group);
 
-module.exports = { User, Message, Group, Contact, UserGroup, ForgetPasswordRequest };
+//archieved table relation
+ArchivedChat.belongsTo(User, { as: "archsender", foreignKey: "senderId" });
+ArchivedChat.belongsTo(User, { as: "archreceiver", foreignKey: "receiverId" });
+Group.hasMany(ArchivedChat);
+ArchivedChat.belongsTo(Group);
+
+module.exports = { User, Message, Group, Contact, UserGroup, ForgetPasswordRequest, ArchivedChat };
