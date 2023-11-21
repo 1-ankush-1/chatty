@@ -1,4 +1,4 @@
-const socket = io("http://localhost:3000/message");
+const socket = io("http://52.73.149.108/message");
 let msgType = "user";
 let maxMessages = 20;
 let currentuserId;
@@ -194,9 +194,9 @@ function handleNewdMessages() {
     let lastMsgId = userMessages[userMessages.length - 1]?.id;
     let queryString;
     if (msgType === "group") {
-        queryString = `http://localhost:3000/message/msg-after-id/${lastMsgId}?groupId=${currentGrpId}`
+        queryString = `http://52.73.149.108/message/msg-after-id/${lastMsgId}?groupId=${currentGrpId}`
     } else {
-        queryString = `http://localhost:3000/message/msg-after-id/${lastMsgId}?receiverId=${currentuserId}`
+        queryString = `http://52.73.149.108/message/msg-after-id/${lastMsgId}?receiverId=${currentuserId}`
     }
     //messages after last message id
     axios.get(queryString, {
@@ -493,7 +493,7 @@ const searchedUserList = document.getElementById("searchedUserList");
 function handleSearchedUser(e) {
     e.preventDefault();
     const name = document.getElementById("searchedusername");
-    axios.get(`http://localhost:3000/user/by_name/${name.value}`, {
+    axios.get(`http://52.73.149.108/user/by_name/${name.value}`, {
         headers: {
             Authorization: usertoken
         }
@@ -551,7 +551,7 @@ friendRequest.addEventListener("click", getAllFriendRequest);
 function getAllFriendRequest(e) {
     e.preventDefault();
 
-    axios.get(`http://localhost:3000/user/friend_request`, {
+    axios.get(`http://52.73.149.108/user/friend_request`, {
         headers: {
             Authorization: usertoken
         }
@@ -617,7 +617,7 @@ function handelFriendRequest(e) {
     const contactId = e.target.parentElement.parentElement.id;
 
     if (status) {
-        axios.put(`http://localhost:3000/user/friend_request/handle/${contactId}`, { status }, {
+        axios.put(`http://52.73.149.108/user/friend_request/handle/${contactId}`, { status }, {
             headers: {
                 Authorization: usertoken
             }
@@ -655,7 +655,7 @@ function handelSendFriendRequest(e) {
         }
     })
 
-    // axios.post(`http://localhost:3000/user/friend_request/send`, { contactUserId }, {
+    // axios.post(`http://52.73.149.108/user/friend_request/send`, { contactUserId }, {
     //     headers: {
     //         Authorization: usertoken
     //     }
@@ -678,7 +678,7 @@ const searchedMemberList = document.getElementById("searchedMemberList");
 function handleSearchedMember(e) {
     e.preventDefault();
     const name = document.getElementById("Addmember");
-    axios.get(`http://localhost:3000/user/by_name/${name.value}`, {
+    axios.get(`http://52.73.149.108/user/by_name/${name.value}`, {
         headers: {
             Authorization: usertoken
         }
@@ -711,7 +711,7 @@ function handleAddMemberInGroup(e) {
     e.preventDefault();
     let id = e.target.id;
     if (confirm("do you want to add this user in group")) {
-        axios.get(`http://localhost:3000/group/admin/add_user?groupId=${currentGrpId}&userId=${id} `, {
+        axios.get(`http://52.73.149.108/group/admin/add_user?groupId=${currentGrpId}&userId=${id} `, {
             headers: {
                 Authorization: usertoken
             },
@@ -835,7 +835,7 @@ function handleGroupModalForm(e) {
     let name = document.getElementById("groupname").value;
     let desc = document.getElementById("groupdesc").value;
     let GroupDetails = { name, desc }
-    axios.post("http://localhost:3000/group/create", GroupDetails, {
+    axios.post("http://52.73.149.108/group/create", GroupDetails, {
         headers: {
             Authorization: usertoken
         }
@@ -852,7 +852,7 @@ function handleGroupModalForm(e) {
 }
 
 function fetchGroups() {
-    axios.get("http://localhost:3000/group/fetch_all", {
+    axios.get("http://52.73.149.108/group/fetch_all", {
         headers: {
             Authorization: usertoken,
         },
@@ -874,7 +874,7 @@ function fetchGroups() {
 //generate link to share
 function handleShareGroup(e) {
     e.preventDefault();
-    let link = `http://localhost:3000/group/add_request/?groupId=${e.currentTarget.parentElement.cid}`;
+    let link = `http://52.73.149.108/group/add_request/?groupId=${e.currentTarget.parentElement.cid}`;
     navigator.clipboard.writeText(link)
         .then(() => {
             alert(`Share your link: '${link}'\n\nIt has also been copied to your clipboard do: Cntrl+v.`);
@@ -901,7 +901,7 @@ leaveGroup.addEventListener("click", handleLeaveGroup);
 function handleLeaveGroup(e) {
     e.preventDefault();
     if (confirm("do you want to leave the group!")) {
-        axios.post("http://localhost:3000/group/leave", { groupId: currentGrpId }, {
+        axios.post("http://52.73.149.108/group/leave", { groupId: currentGrpId }, {
             headers: {
                 Authorization: usertoken,
             }
@@ -923,7 +923,7 @@ allGroupMembers.addEventListener("click", handleGroupMember);
 
 function handleGroupMember(e) {
     e.preventDefault();
-    axios.get(`http://localhost:3000/group/members/?groupId=${currentGrpId}`, {
+    axios.get(`http://52.73.149.108/group/members/?groupId=${currentGrpId}`, {
         headers: {
             Authorization: usertoken,
         }
@@ -947,7 +947,7 @@ function handleGroupMember(e) {
                 if (e.target.className.includes('makeadmin')) {
                     if (confirm(`do you want to Make ${e.target.textContent} admin!`)) {
                         const memberId = e.target.parentNode.id;
-                        axios.put(`http://localhost:3000/group/admin/make_admin`, { userId: memberId, groupId: currentGrpId }, {
+                        axios.put(`http://52.73.149.108/group/admin/make_admin`, { userId: memberId, groupId: currentGrpId }, {
                             headers: {
                                 Authorization: usertoken,
                             }
@@ -967,7 +967,7 @@ function handleGroupMember(e) {
                 if (e.target.parentNode.className.includes('removeadmin') && e.target.className.includes('removeadminofgroup')) {
                     if (confirm(`do you want to remove this member from admin of this group!`)) {
                         const memberId = e.target.parentNode.parentNode.id;
-                        axios.put(`http://localhost:3000/group/admin/remove_admin`, { userId: memberId, groupId: currentGrpId }, {
+                        axios.put(`http://52.73.149.108/group/admin/remove_admin`, { userId: memberId, groupId: currentGrpId }, {
                             headers: {
                                 Authorization: usertoken,
                             }
@@ -989,7 +989,7 @@ function handleGroupMember(e) {
                 if (e.target.parentNode.className.includes('remove member') && e.target.className.includes('removeFromGroup')) {
                     if (confirm("do you want to remove this member!")) {
                         const memberId = e.target.parentNode.parentNode.id;
-                        axios.delete(`http://localhost:3000/group/admin/member/${memberId}?groupId=${currentGrpId}`, {
+                        axios.delete(`http://52.73.149.108/group/admin/member/${memberId}?groupId=${currentGrpId}`, {
                             headers: {
                                 Authorization: usertoken,
                             }
