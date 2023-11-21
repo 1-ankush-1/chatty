@@ -3,10 +3,13 @@ const { User } = require("../models")
 
 const Authentication = (req, res, next) => {
     try {
-        // console.log("here is your token", req.cookietoken);
+        // check for Cookie
+        //console.log("here is your token", req.cookietoken);
         //check if cookie has the token else get from jwt header
-        let token = req.cookietoken ? req.cookietoken : req.header("Authorization")
-        // token = token.split(' ')[1]
+        // let token = req.cookietoken ? req.cookietoken : req.header("Authorization")
+
+        let token = req.header("Authorization")
+        // token = token.split(' ')[1] if sended with bearer
         // console.log(token)
 
         const tokendetails = jwt.verify(token, process.env.SECRET);
@@ -19,6 +22,7 @@ const Authentication = (req, res, next) => {
             }
             // console.log(user)
             req.userId = user.id;
+            // return;
             next();
         }).catch(err => { throw new Error(err) });
     } catch (err) {

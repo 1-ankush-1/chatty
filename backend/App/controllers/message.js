@@ -7,17 +7,6 @@ let totalMsg;
 
 exports.sendMessage = async (req, res, next) => {
     try {
-        const msgIo = req.io.of("/message/send");
-        msgIo.use((socket, next) => {
-            console.log("listenning------>")
-            console.log(socket.handshake.message)
-            next();
-        })
-        // req.io.on("sendmsg", (message) => {
-        //     console.log("in");
-        //     console.log("got the message",message);
-        // })
-
         const userId = req.userId;
         const data = req.body;
         const file = req.files?.file;
