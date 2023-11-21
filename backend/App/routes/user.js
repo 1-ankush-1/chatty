@@ -4,6 +4,6 @@ const userController = require("../controllers/user");
 const friendRequestRoutes = require("./friendRequest.js");
 
 router.get("/by_name/:name", userController.getUsersByName);
-router.use("/friend_request", friendRequestRoutes);
+router.use("/friend_request", friendRequestRoutes);      //subRoutes for friend request
 
 module.exports = router;
