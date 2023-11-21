@@ -877,7 +877,7 @@ function handleShareGroup(e) {
     let link = `http://52.73.149.108/group/add_request/?groupId=${e.currentTarget.parentElement.cid}`;
 
 
-    if (!navigator.clipboard) {
+    if (navigator.clipboard) {
         //only work with https
         navigator.clipboard.writeText(link)
             .then(() => {
