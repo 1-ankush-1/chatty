@@ -84,6 +84,9 @@ input:hover {
 #chatUserNamesList li:hover {
   background-color: var(--dkgrey);
 }
+#chatUserNamesList {
+  background-color: inherit;
+}
 img {
   cursor: pointer;
 }
@@ -120,6 +123,7 @@ img {
   padding: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  background-color: inherit;
 }
 
 body {
@@ -143,6 +147,6 @@ body {
   color: var(--black);
 }
 ul {
-  background-color: var(--white) !important;
+  background-color: var(--white);
   color: var(--black);
 }
