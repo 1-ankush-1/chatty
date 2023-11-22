@@ -1157,6 +1157,7 @@ logout.addEventListener("click", handleLogout);
 function handleLogout(e) {
     e.preventDefault();
     localStorage.removeItem("chatToken");
-    localStorage.removeItem("userData")
+    localStorage.removeItem("userData");
+    localStorage.removeItem("userMessages");
     window.location.href = "../../login/html/login.html";
 }
