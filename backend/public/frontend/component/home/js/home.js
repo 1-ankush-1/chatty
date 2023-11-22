@@ -128,7 +128,7 @@ function handleOldMessages() {
             loadOldMessages.removeAttribute("hidden");
             const messages = result.data;
             let oldmsglength = messages.length
-            console.log(messages, unorderedChatBox);
+            // console.log(messages, unorderedChatBox);
             // Remove old messages from the back(if maxsize exceed)
             if (maxMessages <= userMessages.length + oldmsglength) {
                 // console.log("size", maxMessages, "old =", userMessages.length, "new =", oldmsglength, "sum =", userMessages.length + oldmsglength, "exceed by=", userMessages.length + oldmsglength - maxMessages);
@@ -817,19 +817,31 @@ function addChatInHtml(chat, chatType) {
     chatType = "";
 }
 
+//selected list item bg color
+function selectActiveListInChatNames(item) {
+    const allNames = document.querySelectorAll('#chatUserNamesList li');
+    //remove from all others
+    allNames.forEach(function (name) {
+        name.classList.remove('clicked');
+    });
+    //add 'clicked' class to the clicked list item
+    item.target.parentElement.parentElement.classList.add('clicked');
+}
+
+//dynamic behaviour(phone friendly)
 const backToChatList = document.getElementById("backToChatList");
 backToChatList.addEventListener("click", goBackTochatListNames);
 
 function goBackTochatListNames() {
-    //dynamic
+    //Dynamic
     messageScreen = document.getElementById("chatScreen");
     chatListNames = document.getElementById("chatUserNames");
-    // Check if the right side is showing, and if so, remove the 'show' class
+    //Check if the right side is showing, and if so, remove the 'show' class
     if (messageScreen.classList.contains('show')) {
         messageScreen.classList.remove('show');
     }
 
-    // Check if the left side is hidden, and if so, remove the 'hide' class
+    //Check if the left side is hidden, and if so, remove the 'hide' class
     if (chatListNames.classList.contains('hide')) {
         chatListNames.classList.remove('hide');
     }
@@ -837,7 +849,11 @@ function goBackTochatListNames() {
 
 function showMessages(e) {
     e.preventDefault();
+    //get msg type
     msgType = e.currentTarget.parentElement.msgType;
+
+    //selected item bg color
+    selectActiveListInChatNames(e);
 
     //dynamic
     messageScreen = document.getElementById("chatScreen");
@@ -849,17 +865,24 @@ function showMessages(e) {
         messageScreen.classList.toggle('show');
     }
 
+    //group or user
     if (msgType === "group") {
         document.getElementById("chatScreenHeader").className = "d-flex justify-content-between p-2"
     } else {
         document.getElementById("chatScreenHeader").className = "d-none"
     }
+
+    //show send message div
     document.getElementById("sendMsg").removeAttribute("hidden");
 
-    //cleare the messages of prev group
+    //clear the messages of prev group
     clearMessageScreeen();
+
+    //old message btn
     const loadOldMessages = document.getElementById("loadOldMessages");
     loadOldMessages.setAttribute("hidden", "");
+
+    //fetch message acc to msg type
     if (e.currentTarget.parentElement.msgType === "group") {
         currentGrpId = e.currentTarget.parentElement.cid;
         currentuserId = null

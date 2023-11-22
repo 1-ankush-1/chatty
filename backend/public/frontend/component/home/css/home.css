@@ -24,9 +24,9 @@
 #sendFile {
   cursor: pointer;
 }
-input:hover {
+/* input:hover {
   border-color: var(--black);
-}
+} */
 
 .navbar {
   border-bottom: 1px solid var(--offgrey);
@@ -81,7 +81,8 @@ input:hover {
   display: none;
 }
 
-#chatUserNamesList li:hover {
+#chatUserNamesList li:hover,
+#chatUserNamesList li.clicked {
   background-color: var(--dkgrey);
 }
 #chatUserNamesList {
