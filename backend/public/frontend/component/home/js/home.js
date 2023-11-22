@@ -624,7 +624,13 @@ function handelFriendRequest(e) {
         }).then(res => {
             // console.log(res);
             if (res.status === 200) {
-                alert(`friend request ${status} successfully`)
+                try {
+                    noOfFriendRequest.textContent = Number(noOfFriendRequest.textContent) - 1;
+                    alert(`friend request ${status} successfully`)
+                    window.location.reload();
+                } catch (err) {
+                    console.log(err);
+                }
             }
         }).catch(err => {
             console.log(err);
@@ -750,9 +756,10 @@ function addChatInHtml(chat, chatType) {
         sharebtn.innerHTML = '<i class="fas fa-share-alt"></i>';
     } else {
         li.msgType = "user";
-        const time = msgTimer(chat.lastSeen);
+        const lastuseronline = chat?.lastSeen ?? new Date();
+        const time = msgTimer(lastuseronline);
         let now = new Date();
-        let lastSeen = new Date(chat.lastSeen);
+        let lastSeen = new Date(lastuseronline);
 
         // Round to nearest minute
         now.setSeconds(0, 0);
