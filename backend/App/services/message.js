@@ -101,7 +101,7 @@ exports.getMessages = async (body) => {
         }, { transaction: t })]);
 
         //check if old msg exist
-        let oldmessages = totalNoOfMsg - allMessages.length > 0 ? true : false;
+        let oldmessages = totalNoOfMsg - allMessages.length > msgLimit ? true : false;
         totalMsg = totalNoOfMsg;
         // console.log(totalMsg);
         t.commit();
@@ -158,12 +158,12 @@ exports.getMessagesBeforeId = async (body) => {
 
         const allMessages = await Message.findAll({
             where: queryConditions,
-            order: [['createdAt', 'ASC']],
+            order: [['createdAt', 'DESC']],
             limit: msgLimit
         }, { transaction: t });
 
         //check if old msg exist
-        let oldmessages = totalMsg - allMessages.length > 0 ? false : true;
+        let oldmessages = totalMsg - allMessages.length > msgLimit ? true : false;
         totalMsg = totalMsg - allMessages.length;
         t.commit();
         return { data: allMessages, oldmessages }

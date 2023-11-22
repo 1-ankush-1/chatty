@@ -1,6 +1,6 @@
 const socket = io("http://52.73.149.108/message");
 let msgType = "user";
-let maxMessages = 20;
+let maxMessages = 30;
 let currentuserId;
 let currentGrpId;
 let myInterval;
@@ -121,19 +121,26 @@ function handleOldMessages() {
 
     socket.emit("receivemsg-before-id", body)
 
+    socket.off("receivemsg-before-id");
     socket.on("receivemsg-before-id", (result) => {
         try {
             const loadOldMessages = document.getElementById("loadOldMessages");
             loadOldMessages.removeAttribute("hidden");
             const messages = result.data;
             let oldmsglength = messages.length
-
-            // Remove old messages from the back
-            if (userMessages.length > oldmsglength) {
-                userMessages = userMessages.slice(0, userMessages.length - oldmsglength);
+            console.log(messages, unorderedChatBox);
+            // Remove old messages from the back(if maxsize exceed)
+            if (maxMessages <= userMessages.length + oldmsglength) {
+                // console.log("size", maxMessages, "old =", userMessages.length, "new =", oldmsglength, "sum =", userMessages.length + oldmsglength, "exceed by=", userMessages.length + oldmsglength - maxMessages);
+                // if (userMessages.length > oldmsglength) {
+                userMessages = userMessages.slice(0, userMessages.length + oldmsglength - maxMessages);    //0 to exceedbynofomessages
             }
             // Add old messages to the front
-            userMessages = messages.concat(userMessages);
+            // userMessages = messages.concat(userMessages);
+            // [...messages.reverse(), ...userMessages];
+            let messageSet = new Set(messages.reverse());
+            userMessages = Array.from(new Set([...messageSet, ...userMessages]));
+
             localStorage.setItem("userMessages", JSON.stringify(userMessages));
 
             // Remove from DOM
@@ -144,11 +151,14 @@ function handleOldMessages() {
 
             // Add elements to the DOM
             for (let i = messages.length - 1; i >= 0; i--) {
-                addMessagesBeforeInHtml(messages[i], unorderedChatBox);
+                if (messages[i].fileUrl === null) {
+                    addMessagesBeforeInHtml(messages[i], unorderedChatBox);
+                } else {
+                    displayImageInMsgHtml(messages[i], unorderedChatBox, "before");
+                }
             }
             parentChatBoxDiv.appendChild(unorderedChatBox);
 
-            // console.log(res.data.oldmessages, "call");
             //old message flag
             if (!result.oldmessages) {
                 loadOldMessages.setAttribute("hidden", "");
@@ -182,6 +192,14 @@ function addMessagesBeforeInHtml(message, ul) {
 
     li.appendChild(wrapper); // Add the wrapper to the div
     ul.prepend(li);
+}
+
+function displayImageBeforeInMsgHtml(ul, li) {
+    ul.prepend(li);
+}
+
+function displayImageAfterInMsgHtml(ul, li) {
+    ul.appendChild(li)
 }
 
 /**
@@ -399,7 +417,7 @@ function displaySendMessages() {
                 if (msg.fileUrl === null || msg.fileUrl === undefined) {
                     addChatMessagesInHtml(msg, unorderedChatBox);
                 } else {
-                    displayImageInMsgHtml(msg, unorderedChatBox)
+                    displayImageInMsgHtml(msg, unorderedChatBox);
                 }
                 sendMsgForm.reset();
                 // console.log(document.body.scrollHeight)
@@ -408,7 +426,7 @@ function displaySendMessages() {
         } catch (err) { console.log(err) }
     });
 }
-function displayImageInMsgHtml(message, ul) {
+function displayImageInMsgHtml(message, ul, position) {
     //file sets
     const imageExtensions = new Set(['jpg', 'jpeg', 'png', 'gif', 'bmp']);
     const fileExtensions = new Set(['pdf', 'doc', 'docx', 'xml']);
@@ -476,7 +494,11 @@ function displayImageInMsgHtml(message, ul) {
     wrapper.appendChild(small);
     li.appendChild(wrapper);
     // console.log(li)
-    ul.appendChild(li);
+    if (position === "before") {
+        ul.prepend(li);
+    } else {
+        ul.appendChild(li);
+    }
 }
 /**
  * User
