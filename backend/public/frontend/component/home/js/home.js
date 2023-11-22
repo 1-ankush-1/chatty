@@ -449,7 +449,7 @@ function displayImageInMsgHtml(message, ul, position) {
     const wrapper = document.createElement("div");
 
     const div = document.createElement("div");
-    div.className = (message.senderId === userData.id) ? "p-3 mt-2 mb-1 mx-2 bg-light text-wrap rounded text-start position-relative sender" : "p-3  mt-2 mb-1 mx-2 text-wrap rounded text-end receiver position-relative";
+    div.className = (message.senderId === userData.id) ? "p-3 mt-2 mb-1 mx-2 bg-light text-wrap rounded text-start sender" : "p-3  mt-2 mb-1 mx-2 text-wrap rounded text-end receiver";
     const filename = document.createElement("h6");
     const object = document.createElement("object");
     object.setAttribute("height", "200px");
@@ -817,9 +817,38 @@ function addChatInHtml(chat, chatType) {
     chatType = "";
 }
 
+const backToChatList = document.getElementById("backToChatList");
+backToChatList.addEventListener("click", goBackTochatListNames);
+
+function goBackTochatListNames() {
+    //dynamic
+    messageScreen = document.getElementById("chatScreen");
+    chatListNames = document.getElementById("chatUserNames");
+    // Check if the right side is showing, and if so, remove the 'show' class
+    if (messageScreen.classList.contains('show')) {
+        messageScreen.classList.remove('show');
+    }
+
+    // Check if the left side is hidden, and if so, remove the 'hide' class
+    if (chatListNames.classList.contains('hide')) {
+        chatListNames.classList.remove('hide');
+    }
+}
+
 function showMessages(e) {
     e.preventDefault();
     msgType = e.currentTarget.parentElement.msgType;
+
+    //dynamic
+    messageScreen = document.getElementById("chatScreen");
+    chatListNames = document.getElementById("chatUserNames");
+    if (!chatListNames.classList.contains('hide')) {
+        chatListNames.classList.toggle('hide');
+    }
+    if (!messageScreen.classList.contains('show')) {
+        messageScreen.classList.toggle('show');
+    }
+
     if (msgType === "group") {
         document.getElementById("chatScreenHeader").className = "d-flex justify-content-between p-2"
     } else {

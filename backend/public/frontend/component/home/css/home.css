@@ -189,3 +189,21 @@ ul {
 .custom-toggler.navbar-toggler-icon span:nth-child(3) {
   top: 8px;
 }
+
+#backToChatList {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  #chatScreen.show {
+    display: block !important;
+  }
+
+  #chatUserNames.hide {
+    display: none !important;
+  }
+
+  #backToChatList {
+    display: block;
+  }
+}

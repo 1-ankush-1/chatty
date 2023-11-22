@@ -66,7 +66,7 @@
                 <input
                   type="text"
                   class="form-control"
-                  placeholder="search friend"
+                  placeholder="Add friend"
                   id="searchedusername"
                   title="search new user"
                 />
@@ -176,7 +176,7 @@
     </nav>
 
     <main
-      class="d-flex flex-row gap-2 w-100 justify-content-between px-3 overflow-hidden px-5"
+      class="d-flex flex-row gap-2 w-100 justify-content-between px-3 overflow-hidden px-lg-5"
     >
       <!--Left side-->
       <div class="col-12 col-md-2" id="chatUserNames">
@@ -197,6 +197,9 @@
       </div>
       <!--Right side-->
       <div class="col-12 col-md-10 d-none d-md-block" id="chatScreen">
+        <div id="backToChatList">
+          <i class="fa fa-arrow-left" aria-hidden="true"></i>
+        </div>
         <!--Right side Head-->
         <div class="d-none" id="chatScreenHeader">
           <div class="d-flex flex-row gap-2">
