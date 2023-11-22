@@ -421,7 +421,7 @@ function displaySendMessages() {
                 }
                 sendMsgForm.reset();
                 // console.log(document.body.scrollHeight)
-                parentChatBoxDiv.scrollTo(0, document.body.scrollHeight);
+                parentChatBoxDiv.scrollTo(0, parentChatBoxDiv.scrollHeight);
             }
         } catch (err) { console.log(err) }
     });
