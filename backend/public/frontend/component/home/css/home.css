@@ -195,6 +195,9 @@ ul {
 }
 
 @media (max-width: 767px) {
+  #chatMessage {
+    height: 74vh !important;
+  }
   #chatScreen.show {
     display: block !important;
   }
