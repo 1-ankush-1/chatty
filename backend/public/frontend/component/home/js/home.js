@@ -666,18 +666,19 @@ function handelSendFriendRequest(e) {
     const contactUserId = e.target.parentElement.id;
 
     // socket.off("sendrequest");
-    socket.emit("sendrequest", { contactUserId });
+    socket.emit("sendrequest", { contactUserId }, function () {
+        alert('successfully send friend request');
+    });
 
+    socket.off("sendrequest");
     socket.on("sendrequest", (msg) => {
         try {
+            // console.log(msg)
             if (!msg) {
                 return
             }
-
-            if (noOfRequest < msg.data.length) {
-                noOfRequest = msg.data.length;
-                document.getElementById("noOfFriendRequest").value = noOfRequest
-            }
+            const friend_request = document.getElementById("noOfFriendRequest")
+            friend_request.textContent = friend_request.textContent + 1;
         } catch (err) {
             console.log(err);
         }

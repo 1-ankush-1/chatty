@@ -38,15 +38,16 @@ function handleMessaging(msgIo) {
             }
         })
 
-        socket.on("sendrequest", async (body) => {
+        socket.on("sendrequest", async (body, callback) => {
             try {
                 body.userId = socket.userId;
                 await sendRequest(body);
                 const result = await getRequests({ userId: body.contactUserId })
-                console.log(result);
+                // console.log(result);
                 let findSocketId;
                 findSocketId = users[body.contactUserId];
                 msgIo.to(findSocketId).emit("sendrequest", result);
+                callback();             //request send successfull
             } catch (err) {
                 console.log(`${err} in socket sendrequest event`);
             }
