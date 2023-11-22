@@ -101,7 +101,7 @@ exports.getMessages = async (body) => {
         }, { transaction: t })]);
 
         //check if old msg exist
-        let oldmessages = totalNoOfMsg - allMessages.length > msgLimit ? true : false;
+        let oldmessages = totalNoOfMsg - allMessages.length > 0 ? true : false;
         totalMsg = totalNoOfMsg;
         // console.log(totalMsg);
         t.commit();
