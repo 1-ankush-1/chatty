@@ -194,10 +194,23 @@ function addMessagesBeforeInHtml(message, ul) {
     h5.style.whiteSpace = 'normal';
     wrapper.appendChild(h5); // Add the h5 to the wrapper
 
+    const msgMetaDataDiv = document.createElement("div");
+    msgMetaDataDiv.className = "d-flex  mx-3 gap-3";
+
+    //date
     const small = document.createElement("small");
     small.textContent = time
-    small.className = "text-2 d-block mx-3";
-    wrapper.appendChild(small); // Add the small to the wrapper
+    small.className = "text-2 d-block";
+
+    //sender name
+    const sendername = document.createElement("small");
+    sendername.textContent = (message.senderId === userData.id) ? "you" : message.sendername.slice(0, 8);
+    sendername.className = "d-block";
+
+    msgMetaDataDiv.appendChild(sendername);
+    msgMetaDataDiv.appendChild(small);
+
+    wrapper.appendChild(msgMetaDataDiv); // Add the MetaDiv to the wrapper
 
     li.appendChild(wrapper); // Add the wrapper to the div
     ul.prepend(li);
@@ -215,67 +228,67 @@ function displayImageAfterInMsgHtml(ul, li) {
  * Fetch Messages
  */
 
-function handleNewdMessages() {
-    //get all the messages
-    let userMessages = JSON.parse(localStorage.getItem("userMessages"));
-    let lastMsgId = userMessages[userMessages.length - 1]?.id;
-    let queryString;
-    if (msgType === "group") {
-        queryString = `http://52.73.149.108/message/msg-after-id/${lastMsgId}?groupId=${currentGrpId}`
-    } else {
-        queryString = `http://52.73.149.108/message/msg-after-id/${lastMsgId}?receiverId=${currentuserId}`
-    }
-    //messages after last message id
-    axios.get(queryString, {
-        headers: {
-            Authorization: usertoken
-        }
-    }).then(res => {
-        if (res.status === 200) {
-            // console.log(res.data.data)
-            const messages = res.data.data;
-            const newmsglength = messages.length;
+// function handleNewdMessages() {
+//     //get all the messages
+//     let userMessages = JSON.parse(localStorage.getItem("userMessages"));
+//     let lastMsgId = userMessages[userMessages.length - 1]?.id;
+//     let queryString;
+//     if (msgType === "group") {
+//         queryString = `http://52.73.149.108/message/msg-after-id/${lastMsgId}?groupId=${currentGrpId}`
+//     } else {
+//         queryString = `http://52.73.149.108/message/msg-after-id/${lastMsgId}?receiverId=${currentuserId}`
+//     }
+//     //messages after last message id
+//     axios.get(queryString, {
+//         headers: {
+//             Authorization: usertoken
+//         }
+//     }).then(res => {
+//         if (res.status === 200) {
+//             // console.log(res.data.data)
+//             const messages = res.data.data;
+//             const newmsglength = messages.length;
 
-            if (newmsglength > 0) {
-                // Calculate how many messages exceed the maximum limit
-                let excessMessages = userMessages.length + newmsglength - maxMessages;
+//             if (newmsglength > 0) {
+//                 // Calculate how many messages exceed the maximum limit
+//                 let excessMessages = userMessages.length + newmsglength - maxMessages;
 
-                if (excessMessages > 0) {
-                    // Remove old messages from the front to maintain the maximum limit
-                    userMessages = userMessages.slice(excessMessages);
-                    // Update userMessages with new messages
-                    userMessages = userMessages.concat(messages);
+//                 if (excessMessages > 0) {
+//                     // Remove old messages from the front to maintain the maximum limit
+//                     userMessages = userMessages.slice(excessMessages);
+//                     // Update userMessages with new messages
+//                     userMessages = userMessages.concat(messages);
 
-                    // Remove from DOM
-                    while (unorderedChatBox.hasChildNodes() && excessMessages > 0) {
-                        unorderedChatBox.removeChild(unorderedChatBox.firstChild);
-                        excessMessages--;
-                    }
-                } else {
-                    // Just add new messages to the userMessages
-                    userMessages = userMessages.concat(messages);
-                }
+//                     // Remove from DOM
+//                     while (unorderedChatBox.hasChildNodes() && excessMessages > 0) {
+//                         unorderedChatBox.removeChild(unorderedChatBox.firstChild);
+//                         excessMessages--;
+//                     }
+//                 } else {
+//                     // Just add new messages to the userMessages
+//                     userMessages = userMessages.concat(messages);
+//                 }
 
-                // Update localStorage with the updated userMessages
-                localStorage.setItem("userMessages", JSON.stringify(userMessages));
+//                 // Update localStorage with the updated userMessages
+//                 localStorage.setItem("userMessages", JSON.stringify(userMessages));
 
-                // Add elements to the DOM
-                for (let msg of messages) {
-                    addChatMessagesInHtml(msg, unorderedChatBox);
-                }
-                parentChatBoxDiv.appendChild(unorderedChatBox);
+//                 // Add elements to the DOM
+//                 for (let msg of messages) {
+//                     addChatMessagesInHtml(msg, unorderedChatBox);
+//                 }
+//                 parentChatBoxDiv.appendChild(unorderedChatBox);
 
-                //old message flag
-                if (res.data.oldmessages) {
-                    const loadOldMessages = document.getElementById("loadOldMessages");
-                    loadOldMessages.removeAttribute("hidden");
-                }
-            }
-        }
-    }).catch(err => {
-        console.log(err);
-    })
-}
+//                 //old message flag
+//                 if (res.data.oldmessages) {
+//                     const loadOldMessages = document.getElementById("loadOldMessages");
+//                     loadOldMessages.removeAttribute("hidden");
+//                 }
+//             }
+//         }
+//     }).catch(err => {
+//         console.log(err);
+//     })
+// }
 
 
 function fetchMessages(to) {
@@ -343,10 +356,23 @@ function addChatMessagesInHtml(message, ul) {
     h5.className = (message.senderId === userData.id) ? "p-2 mt-2 mb-1 mx-2 bg-light text-wrap rounded text-start sender" : "p-2 mt-2 mb-1 mx-2 text-wrap rounded text-end receiver"
     wrapper.appendChild(h5); // Add the h5 to the wrapper
 
+    const msgMetaDataDiv = document.createElement("div");
+    msgMetaDataDiv.className = "d-flex  mx-3 gap-3";
+
+    //date
     const small = document.createElement("small");
     small.textContent = time
-    small.className = "text-2 d-block mx-3";
-    wrapper.appendChild(small); // Add the small to the wrapper
+    small.className = "text-2 d-block";
+
+    //sender name
+    const sendername = document.createElement("small");
+    sendername.textContent = (message.senderId === userData.id) ? "you" : message.sendername.slice(0, 8);
+    sendername.className = "d-block";
+
+    msgMetaDataDiv.appendChild(sendername);
+    msgMetaDataDiv.appendChild(small);
+
+    wrapper.appendChild(msgMetaDataDiv); // Add the MetaDiv to the wrapper
 
     li.appendChild(wrapper); // Add the wrapper to the div
 
@@ -496,15 +522,28 @@ function displayImageInMsgHtml(message, ul, position) {
     icon.title = "download"
     downloadIcon.appendChild(icon);
 
+    //--
+    const msgMetaDataDiv = document.createElement("div");
+    msgMetaDataDiv.className = "d-flex  mx-3 gap-3";
+
+    //date
     const small = document.createElement("small");
     small.textContent = time
-    small.className = "text-2 d-block mx-3";
+    small.className = "text-2 d-block";
+
+    //sender name
+    const sendername = document.createElement("small");
+    sendername.textContent = (message.senderId === userData.id) ? "you" : message.sendername.slice(0, 8);
+    sendername.className = "d-block";
+
+    msgMetaDataDiv.appendChild(sendername);
+    msgMetaDataDiv.appendChild(small);
 
     div.appendChild(object);
     div.appendChild(filename);
     div.appendChild(downloadIcon);
     wrapper.appendChild(div);
-    wrapper.appendChild(small);
+    wrapper.appendChild(msgMetaDataDiv); // Add the MetaDiv to the wrapper
     li.appendChild(wrapper);
     // console.log(li)
     if (position === "before") {

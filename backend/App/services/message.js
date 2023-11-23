@@ -1,11 +1,12 @@
 const { Op } = require("sequelize");
 const sequelize = require("../config/connect");
-const { Message } = require("../models");
+const { Message, User } = require("../models");
 const { uploadToS3 } = require("./s3_service");
 const msgLimit = Number(process.env.MSG_LIMIT);
 let totalMsg;
 
 exports.sendMessage = async (body) => {
+    const t = await sequelize.transaction();
     try {
         // console.log("1--------------1,in")
         const { userId, file, ...data } = body;
@@ -48,8 +49,25 @@ exports.sendMessage = async (body) => {
         } else {
             return
         }
-        return Message.create(message);
+
+        const [messageData, userData] = await Promise.all([
+            Message.create(message, { transaction: t }),        //create msg
+            User.findOne({                                      //get sender name
+                where: {
+                    id: userId
+                },
+                attributes: ["name"]
+            }, { transaction: t })
+        ]);
+
+        let messageDataPlainObject = messageData.toJSON();
+        messageDataPlainObject["sendername"] = userData.name;
+
+        console.log(messageDataPlainObject, userData.name);
+        await t.commit();
+        return messageDataPlainObject;
     } catch (err) {
+        await t.rollback();
         console.log(`${err} in sendMessage`);
         return
     }
@@ -75,13 +93,13 @@ exports.getMessages = async (body) => {
             queryConditions = {
                 [Op.or]: [
                     {
-                        senderId: parseInt(userId),
-                        receiverId: parseInt(data.receiverId),
+                        senderId: Number(userId),
+                        receiverId: Number(data.receiverId),
                         conversationType: "user"
                     },
                     {
-                        senderId: parseInt(data.receiverId),
-                        receiverId: parseInt(userId),
+                        senderId: Number(data.receiverId),
+                        receiverId: Number(userId),
                         conversationType: "user",
                     }
                 ]
@@ -95,6 +113,24 @@ exports.getMessages = async (body) => {
             where: queryConditions,
             order: [['createdAt', 'DESC']],
             limit: msgLimit,
+            attributes: [
+                'id',
+                "conversationType",
+                "fileUrl",
+                "groupId",
+                "receiverId",
+                "senderId",
+                "text",
+                "updatedAt",
+                [sequelize.col('sender.name'), 'sendername'],
+            ],
+            include: [
+                {
+                    model: User,
+                    as: 'sender',
+                    attributes: [],
+                }
+            ]
         }, { transaction: t }),
         Message.count({
             where: queryConditions
@@ -104,10 +140,10 @@ exports.getMessages = async (body) => {
         let oldmessages = totalNoOfMsg - allMessages.length > 0 ? true : false;
         totalMsg = totalNoOfMsg;
         // console.log(totalMsg);
-        t.commit();
+        await t.commit();
         return { data: allMessages, oldmessages };
     } catch (err) {
-        t.rollback();
+        await t.rollback();
         console.log(`${err} in getMessages`);
         return
     }
@@ -135,16 +171,16 @@ exports.getMessagesBeforeId = async (body) => {
             queryConditions = {
                 [Op.or]: [
                     {
-                        senderId: parseInt(userId),
-                        receiverId: parseInt(data.receiverId),
+                        senderId: Number(userId),
+                        receiverId: Number(data.receiverId),
                         conversationType: "user",
                         id: {
                             [Op.lt]: id
                         }
                     },
                     {
-                        senderId: parseInt(data.receiverId),
-                        receiverId: parseInt(userId),
+                        senderId: Number(data.receiverId),
+                        receiverId: Number(userId),
                         conversationType: "user",
                         id: {
                             [Op.lt]: id
@@ -159,16 +195,34 @@ exports.getMessagesBeforeId = async (body) => {
         const allMessages = await Message.findAll({
             where: queryConditions,
             order: [['createdAt', 'DESC']],
-            limit: msgLimit
+            limit: msgLimit,
+            attributes: [
+                'id',
+                "conversationType",
+                "fileUrl",
+                "groupId",
+                "receiverId",
+                "senderId",
+                "text",
+                "updatedAt",
+                [sequelize.col('sender.name'), 'sendername'],    //using alias to get name out of obj
+            ],
+            include: [                                          //sender name
+                {
+                    model: User,
+                    as: 'sender',
+                    attributes: [],
+                }
+            ]
         }, { transaction: t });
 
         //check if old msg exist
         let oldmessages = totalMsg - allMessages.length > msgLimit ? true : false;
         totalMsg = totalMsg - allMessages.length;
-        t.commit();
+        await t.commit();
         return { data: allMessages, oldmessages }
     } catch (err) {
-        t.rollback();
+        await t.rollback();
         console.log(`${err} in getMessagesBeforeId `);
         return
     }
