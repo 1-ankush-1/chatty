@@ -522,6 +522,9 @@ function handleSearchedUser(e) {
     }).then(res => {
         if (res.status === 200) {
             // console.log(res)
+            if (res.data.data.length <= 0) {
+                alert("no user found");
+            }
             for (let user of res.data.data) {
                 placeSearchedUserInHtml(user);
             }
@@ -707,13 +710,16 @@ const searchedMemberList = document.getElementById("searchedMemberList");
 function handleSearchedMember(e) {
     e.preventDefault();
     const name = document.getElementById("Addmember");
-    axios.get(`http://52.73.149.108/user/by_name/${name.value}`, {
+    axios.get(`http://52.73.149.108/group/admin/contact_name/${name.value}`, {
         headers: {
             Authorization: usertoken
         }
     }).then(res => {
         if (res.status === 200) {
             // console.log(res)
+            if (res.data.data.length <= 0) {
+                alert("no contact found");
+            }
             for (let user of res.data.data) {
                 placeSearchedMemberInHtml(user);
             }

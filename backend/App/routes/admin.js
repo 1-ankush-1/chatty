@@ -6,5 +6,6 @@ router.delete("/member/:id", adminController.removeMemberFromGroup);
 router.get("/add_user", adminController.addUserInGroup);
 router.put("/make_admin", adminController.creatingAdminOfGroup);
 router.put("/remove_admin", adminController.removeAdminOfGroup);
+router.get("/contact_name/:name", adminController.getContactDetails);
 
 module.exports = router;

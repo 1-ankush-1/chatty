@@ -6,10 +6,14 @@ exports.getUsersByName = async (req, res, next) => {
     try {
 
         const { name } = req.params;
+        const userId = req.userId;
         const allUser = await User.findAll({
             where: {
                 name: {
                     [Op.like]: '%' + name + '%'
+                },
+                id: {
+                    [Op.ne]: Number(userId)
                 }
             },
             attributes: ["id", "name"]
@@ -56,7 +60,7 @@ exports.displayChatName = async (req, res, next) => {
                 {
                     model: User,
                     as: 'usercontact',
-                    attributes: ['id', 'name','lastSeen']
+                    attributes: ['id', 'name', 'lastSeen']
                 }
             ],
             attributes: [],
@@ -70,7 +74,7 @@ exports.displayChatName = async (req, res, next) => {
                 {
                     model: User,
                     as: 'individualuser',
-                    attributes: ['id', 'name','lastSeen']
+                    attributes: ['id', 'name', 'lastSeen']
                 }
             ],
             attributes: [],
