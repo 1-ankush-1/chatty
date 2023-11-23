@@ -34,7 +34,7 @@ function handelLogin(e) {
             localStorage.setItem("chatToken", res.data.token)
             localStorage.setItem("userData", JSON.stringify(res.data.data));
             document.getElementById("passwordmessage").setAttribute("hidden", "");
-            alert("User SuccessFully Registered");
+            alert("User SuccessFully Login");
             window.location.href = "../../home/html/home.html"
         }
     }).catch(err => {
