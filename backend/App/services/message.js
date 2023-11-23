@@ -63,7 +63,7 @@ exports.sendMessage = async (body) => {
         let messageDataPlainObject = messageData.toJSON();
         messageDataPlainObject["sendername"] = userData.name;
 
-        console.log(messageDataPlainObject, userData.name);
+        // console.log(messageDataPlainObject, userData.name);
         await t.commit();
         return messageDataPlainObject;
     } catch (err) {
