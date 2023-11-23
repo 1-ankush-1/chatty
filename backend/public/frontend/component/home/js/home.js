@@ -86,7 +86,16 @@ function handelImageToSend(e) {
 }
 
 function handleDisplayMessageImage(e) {
+    document.getElementById("message").value = "";
     let file = e.target.files[0];
+    var maxSize = 1024 * 1024 * 5; // Maximum size in bytes
+
+    if (file.size > maxSize) {
+        alert('File is too large, maximum size is 5MB');
+        attachement = null;
+        return
+    }
+
     // Check if the file exists and is an image
     // if (file && file.type.startsWith('image/')) {
     if (file) {
@@ -383,6 +392,10 @@ function handlesendMsgForm(e) {
     // console.log("what")
     messageContent.type = msgType;
     messageContent.file = attachement;
+    if (messageContent.text === "" && !attachement) {
+        alert("enter text or image")
+        return
+    }
     if (attachement) {
         // console.log("in")
         messageContent.text = "";
