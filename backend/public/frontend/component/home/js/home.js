@@ -785,7 +785,7 @@ function addChatInHtml(chat, chatType) {
     const ul = document.getElementById("chatUserNamesList");
     const li = document.createElement("li");
     li.cid = chat.id
-    li.className = "d-flex justify-content-between chatusernamelistitem p-2 cursor-pointer"
+    li.className = "d-flex justify-content-between chatusernamelistitem p-2"
     const div = document.createElement("div");
     // if (chatType === "group") {
     // console.log(chat.type)
@@ -793,7 +793,7 @@ function addChatInHtml(chat, chatType) {
         // console.log("in")
         li.msgType = "group";
         sharebtn = document.createElement("button");
-        sharebtn.className = "btn h-100"
+        sharebtn.className = "btn h-100 cursor-pointer"
         sharebtn.title = "Share group url"
         sharebtn.innerHTML = '<i class="fas fa-share-alt"></i>';
     } else {
@@ -814,7 +814,7 @@ function addChatInHtml(chat, chatType) {
         }
 
     }
-    div.className = "d-flex justify-content-center flex-column align-center"
+    div.className = "d-flex justify-content-center flex-column align-center cursor-pointer"
     const h3 = document.createElement("h6");
     h3.className = "chatusername"
     h3.textContent = chat.name
