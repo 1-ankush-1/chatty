@@ -44,7 +44,7 @@ async function onloadData() {
             window.location.href = "../../login/html/login.html";
         }
         //fetch all the messages
-        fetchGroups();
+        fetchAllChatsNames();
     } catch (err) {
         console.log(err);
         if (err.response && (err.response.status === 404 || err.response.status === 500)) {
@@ -952,7 +952,7 @@ function handleGroupModalForm(e) {
     })
 }
 
-function fetchGroups() {
+function fetchAllChatsNames() {
     axios.get("http://52.73.149.108/group/fetch_all", {
         headers: {
             Authorization: usertoken,
@@ -1065,76 +1065,78 @@ function handleGroupMember(e) {
             for (let member of allMembers) {
                 showGroupMembersInHtml(member, ul, admin)
             }
-            ul.addEventListener('click', (e) => {
-                // Stop the propagation of the click event
-                e.stopPropagation();
-                if (e.target.className.includes('makeadmin')) {
-                    if (confirm(`do you want to Make ${e.target.textContent} admin!`)) {
-                        const memberId = e.target.parentNode.id;
-                        axios.put(`http://52.73.149.108/group/admin/make_admin`, { userId: memberId, groupId: currentGrpId }, {
-                            headers: {
-                                Authorization: usertoken,
-                            }
-                        }).then(res => {
-                            if (res.status === 200) {
-                                alert("made admin successfully");
-                                window.location.reload();
-                            }
-                        }).catch(err => {
-                            console.log(err);
-                            alert("failed to make memeber admin!!")
-                        })
-                    }
-                    return;
-                }
-
-                if (e.target.parentNode.className.includes('removeadmin') && e.target.className.includes('removeadminofgroup')) {
-                    if (confirm(`do you want to remove this member from admin of this group!`)) {
-                        const memberId = e.target.parentNode.parentNode.id;
-                        axios.put(`http://52.73.149.108/group/admin/remove_admin`, { userId: memberId, groupId: currentGrpId }, {
-                            headers: {
-                                Authorization: usertoken,
-                            }
-                        }).then(res => {
-                            if (res.status === 200) {
-                                alert("removed admin successfully");
-                                window.location.reload();
-                            }
-                        }).catch(err => {
-                            console.log(err);
-                            alert("failed to remove memeber from admin!!")
-                        })
-                    }
-                    return;
-                }
-
-                // Check if the clicked element is a button
-                // console.log("hit", e.target.className)
-                if (e.target.parentNode.className.includes('remove member') && e.target.className.includes('removeFromGroup')) {
-                    if (confirm("do you want to remove this member!")) {
-                        const memberId = e.target.parentNode.parentNode.id;
-                        axios.delete(`http://52.73.149.108/group/admin/member/${memberId}?groupId=${currentGrpId}`, {
-                            headers: {
-                                Authorization: usertoken,
-                            }
-                        }).then(res => {
-                            if (res.status === 200) {
-                                alert("removed successfully");
-                                window.location.reload();
-                            }
-                        }).catch(err => {
-                            console.log(err);
-                            alert("failed to remove memeber!!")
-                        })
-                    }
-                    return;
-                }
-            })
+            ul.addEventListener('click', handelGroupAdminMethods);
         }
     }).catch(err => {
         console.log(err);
         alert("failed to fetch memebers!!")
     })
+}
+
+function handelGroupAdminMethods(e) {
+    // Stop the propagation of the click event
+    e.stopPropagation();
+    if (e.target.className.includes('makeadmin')) {
+        if (confirm(`do you want to Make ${e.target.textContent} admin!`)) {
+            const memberId = e.target.parentNode.id;
+            axios.put(`http://52.73.149.108/group/admin/make_admin`, { userId: memberId, groupId: currentGrpId }, {
+                headers: {
+                    Authorization: usertoken,
+                }
+            }).then(res => {
+                if (res.status === 200) {
+                    alert("made admin successfully");
+                    window.location.reload();
+                }
+            }).catch(err => {
+                console.log(err);
+                alert("failed to make memeber admin!!")
+            })
+        }
+        return;
+    }
+
+    if (e.target.parentNode.className.includes('removeadmin') && e.target.className.includes('removeadminofgroup')) {
+        if (confirm(`do you want to remove this member from admin of this group!`)) {
+            const memberId = e.target.parentNode.parentNode.id;
+            axios.put(`http://52.73.149.108/group/admin/remove_admin`, { userId: memberId, groupId: currentGrpId }, {
+                headers: {
+                    Authorization: usertoken,
+                }
+            }).then(res => {
+                if (res.status === 200) {
+                    alert("removed admin successfully");
+                    window.location.reload();
+                }
+            }).catch(err => {
+                console.log(err);
+                alert("failed to remove memeber from admin!!")
+            })
+        }
+        return;
+    }
+
+    // Check if the clicked element is a button
+    // console.log("hit", e.target.className)
+    if (e.target.parentNode.className.includes('remove member') && e.target.className.includes('removeFromGroup')) {
+        if (confirm("do you want to remove this member!")) {
+            const memberId = e.target.parentNode.parentNode.id;
+            axios.delete(`http://52.73.149.108/group/admin/member/${memberId}?groupId=${currentGrpId}`, {
+                headers: {
+                    Authorization: usertoken,
+                }
+            }).then(res => {
+                if (res.status === 200) {
+                    alert("removed successfully");
+                    window.location.reload();
+                }
+            }).catch(err => {
+                console.log(err);
+                alert("failed to remove memeber!!")
+            })
+        }
+        return;
+    }
 }
 
 function showGroupMembersInHtml(member, ul, admin) {
