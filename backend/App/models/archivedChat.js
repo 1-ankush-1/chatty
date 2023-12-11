@@ -15,7 +15,7 @@ const ArchivedChat = sequelize.define("archivedChat", {                 //should
     }
 })
 
-module.exports = ArchivedChat;
+module.exports = ArchivedChat;  //nothing
 
 
 
