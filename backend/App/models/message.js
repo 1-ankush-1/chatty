@@ -11,14 +11,16 @@ const Message = sequelize.define("message", {
     text: {
         type: Sequelize.STRING,
     },
-    conversationType: {
+    conversationType: {                                 //always use enum with captalize
         type: Sequelize.ENUM("user", "group"),
         allowNull: true,
         defaultValue: "user",
     },
-    fileUrl: {
+    fileUrl: {                                      //always name like attachment and also mention type
         type: Sequelize.TEXT,
     }
 })
 
 module.exports = Message;
+
+

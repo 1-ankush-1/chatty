@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/connect");
 
-const ArchivedChat = sequelize.define("archivedChat", {
+const ArchivedChat = sequelize.define("archivedChat", {                 //should use extra column instead of new table
     text: {
         type: Sequelize.STRING,
     },
@@ -16,3 +16,10 @@ const ArchivedChat = sequelize.define("archivedChat", {
 })
 
 module.exports = ArchivedChat;
+
+
+
+//if more columns are there prefer to use new table
+
+//name should be always common ex-model name is request and controller is friendRequest
+//for file name use hyfen instead of camel case
