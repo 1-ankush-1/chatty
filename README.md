@@ -22,6 +22,19 @@ The application offers a customizable user experience with light and dark modes.
 - **AWS EC2 and RDS**: The application is deployed on AWS EC2, and AWS RDS is used for the database.
 - **Jenkins and GitHub Webhooks**: These are used for continuous integration and continuous deployment (CI/CD).
 
+## Screenshot
+
+### signup page
+  ![image](https://github.com/1-ankush-1/chatty/assets/95346389/9751e3a7-28be-4099-97be-2198152fe897)
+### login page
+  ![image](https://github.com/1-ankush-1/chatty/assets/95346389/4bc99d3b-7853-4f5d-b702-ccc24f8de468)
+### Home page
+![image](https://github.com/1-ankush-1/chatty/assets/95346389/e8eb59e9-4ab4-40d6-9ed2-41377c07e0d2)
+### Create Group
+![image](https://github.com/1-ankush-1/chatty/assets/95346389/a2bdfb11-e824-4d07-bb45-60bf0bfd948a)
+### Group 
+![image](https://github.com/1-ankush-1/chatty/assets/95346389/bf3be75c-5428-481c-8fed-2a31cb3d5fc3)
+
 ## Setup
 
 1. **Clone the repository**: Use the command `git clone <repository-url>`. Replace `<repository-url>` with the URL of this repository. This will copy all the files from this repository to your local machine.
@@ -35,4 +48,8 @@ The application offers a customizable user experience with light and dark modes.
 5. **Start the server**: Use the command `npm start`. This will start the server on a certain port number. You will see a message in the console with the port number.
 
 6. **Access the application**: Open a web browser and go to `localhost:<port>`. Replace `<port>` with the port number you saw in the console. This will open the application.
+
+
+
+
 
