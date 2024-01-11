@@ -24,7 +24,7 @@ middleware - perform a middleware action
 auth with middleware- 
 
         pass the auth from client
-        io("http://34.229.6.78/new",{auth:{token:"anytoken"}})
+        io("http://54.226.26.94/new",{auth:{token:"anytoken"}})
 
         handel error on client
         user.on('connect_error',(err)=>{

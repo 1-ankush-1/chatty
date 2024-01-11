@@ -28,7 +28,7 @@ function handelLogin(e) {
     }
 
     // console.log("data",userData);
-    axios.post("http://34.229.6.78/auth/login-user", userData, { withCredentials: true }).then((res) => {
+    axios.post("http://54.226.26.94/auth/login-user", userData, { withCredentials: true }).then((res) => {
         // console.log(res);
         if (res.status === 200) {
             localStorage.setItem("chatToken", res.data.token)
